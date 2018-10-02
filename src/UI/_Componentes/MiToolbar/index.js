@@ -1,6 +1,9 @@
 import React from "react";
+
+//Styles
 import { withStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
+import styles from "./styles";
 
 //Componentes
 import AppBar from "@material-ui/core/AppBar";
@@ -17,9 +20,10 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 //REDUX
 import { connect } from "react-redux";
 import { cerrarSesion } from "@Redux/Actions/usuario";
-import Icon from '@material-ui/core/Icon';
+import Icon from "@material-ui/core/Icon";
 
 const mapStateToProps = state => {
+  console.log(state);
   return { usuario: state.Usuario.usuario };
 };
 
@@ -54,6 +58,7 @@ class MiToolbar extends React.Component {
     if (this.props.cargando) return;
     this.setState({ anchorPopupUsuario: null });
     this.props.cerrarSesion();
+    window.location.href = window.Config.URL_LOGIN;
   };
 
   handleDrawerClose = () => {
@@ -72,11 +77,20 @@ class MiToolbar extends React.Component {
   };
 
   render() {
-    let { classes, titulo } = this.props;
+    let { classes, titulo, usuario } = this.props;
+    if (usuario == undefined) return null;
+
+    let urlFotoPerfil =
+      window.Config.URL_CORDOBA_FILES +
+      "/Archivo/" +
+      usuario.identificadorFotoPersonal;
 
     return (
       <AppBar position="absolute" className={classNames(classes.appBar)}>
-        <Toolbar disableGutters={true} className={classes.toolbar}>
+        <Toolbar
+          disableGutters={true}
+          className={classNames(classes.toolbar, this.props.className)}
+        >
           {this.props.renderLeftIcon != undefined &&
             this.props.renderLeftIcon()}
 
@@ -93,11 +107,11 @@ class MiToolbar extends React.Component {
               </div>
             )}
 
+          {this.props.renderLeftIcon == undefined &&
+            this.props.leftIcon == undefined && <div style={{ width: 16 }} />}
+
           {/* Logo muni */}
-          {/* <img
-            className={classes.logoMuni}
-            src="https://i2.wp.com/www.cordoba.gob.ar/wp-content/uploads/2016/07/isotipo-negro.png?fit=300%2C300"
-          /> */}
+          {this.props.renderLogo != undefined && this.props.renderLogo()}
 
           <Typography
             variant="title"
@@ -112,7 +126,7 @@ class MiToolbar extends React.Component {
           <IconButton onClick={this.onUsuarioPress} color="inherit">
             <Avatar
               alt="Menu del usuario"
-              src="https://servicios2.cordoba.gov.ar/CordobaFiles/Archivo/f_qdag0f9irgka9xj2l6mbll69gxmhlghezkmkj2mykg1pj0uuhwogqiqfic_c327l9gmyk9tutz1fuq0rc3_z2byq5gcg2j5tjpqcn6jid4x2rlv2nsaa2it7s64d7m2k4h7e_xegt2w8p79uvk4jj42a7uvrcfm1cn8jpq31o4raxvsv8ktwtsa_q6iqbxeop56c_zee/3"
+              src={urlFotoPerfil + "/3"}
               className={classNames(classes.icono)}
             />
           </IconButton>
@@ -130,12 +144,11 @@ class MiToolbar extends React.Component {
           <div className={classes.menuUsuarioInfo} style={{ display: "flex" }}>
             <Avatar
               alt="Menu del usuario"
-              src="https://servicios2.cordoba.gov.ar/CordobaFiles/Archivo/f_qdag0f9irgka9xj2l6mbll69gxmhlghezkmkj2mykg1pj0uuhwogqiqfic_c327l9gmyk9tutz1fuq0rc3_z2byq5gcg2j5tjpqcn6jid4x2rlv2nsaa2it7s64d7m2k4h7e_xegt2w8p79uvk4jj42a7uvrcfm1cn8jpq31o4raxvsv8ktwtsa_q6iqbxeop56c_zee/3"
+              src={urlFotoPerfil + "/2"}
               className={classNames(classes.icono)}
             />
             <Typography align="center" variant="subheading" color="inherit">
-              Federico Gabriel asdasd asdasd adasdasd asdasda sdasd asdasd
-              asdasda Amura
+              {this.props.usuario.nombre + " " + this.props.usuario.apellido}
             </Typography>
           </div>
 
@@ -160,79 +173,6 @@ class MiToolbar extends React.Component {
     );
   }
 }
-
-const styles = theme => {
-  return {
-    toolbar: {
-      paddingRight: 24 // keep right padding when drawer closed
-    },
-    toolbarIcon: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "flex-end",
-      padding: "0 8px",
-      ...theme.mixins.toolbar
-    },
-    menuButton: {
-      marginLeft: 12,
-      marginRight: 12
-    },
-    appBar: {
-      zIndex: theme.zIndex.drawer + 2
-    },
-    logoMuni: {},
-    title: {
-      flexGrow: 1
-    },
-    icono: {
-      width: 40,
-      height: 40,
-      borderRadius: 40,
-      backgroundColor: "white"
-    },
-    menuUsuario: {
-      "& div:nth-child(2)": {
-        width: "20rem",
-        minWidth: "20rem",
-        maxWidth: "20rem"
-      },
-      "& ul": {
-        paddingTop: 0
-      }
-    },
-    menuUsuarioInfo: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: theme.spacing.unit * 2,
-      "& h2": {
-        marginLeft: theme.spacing.unit
-      },
-      "& > div": {
-        width: "5rem",
-        height: "5rem",
-        marginBottom: "0.5rem"
-      },
-      "&:focus": {
-        outline: "none"
-      },
-      backgroundColor: "rgba(0,0,0,0.025)",
-      borderBottom: "1px solid rgba(0, 0, 0, 0.095);"
-    },
-    contenedorCargando: {
-      position: "absolute",
-      bottom: 0,
-      width: "100%",
-      opacity: 0,
-      transition: "all 0.3s"
-      // position: "absolute"
-    },
-    contenedorCargandoVisible: {
-      opacity: 1
-    }
-  };
-};
 
 let componente = undefined;
 componente = withStyles(styles)(MiToolbar);

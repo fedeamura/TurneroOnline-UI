@@ -1,8 +1,8 @@
-import "./public-path";
+// import "./public-path";
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "@UI/App";
-// import registerServiceWorker from "./registerServiceWorker";
+import registerServiceWorker from "./registerServiceWorker";
 import { hot } from "react-hot-loader";
 
 import MuiPickersUtilsProvider from "material-ui-pickers/utils/MuiPickersUtilsProvider";
@@ -33,18 +33,18 @@ const theme = createMuiTheme({
   }
 });
 
-hot(module)(App);
+// hot(module)(App);
 ReactDOM.render(
   <Provider store={Store}>
     <ConnectedRouter history={history}>
-      <MuiThemeProvider theme={theme}>
-        <MuiPickersUtilsProvider utils={DateFnsUtils} locale={arLocale}>
+      <MuiPickersUtilsProvider utils={DateFnsUtils} locale={arLocale}>
+        <MuiThemeProvider theme={theme}>
           <App />
-        </MuiPickersUtilsProvider>
-      </MuiThemeProvider>
+        </MuiThemeProvider>
+      </MuiPickersUtilsProvider>
     </ConnectedRouter>
   </Provider>,
   document.getElementById("root")
 );
 
-// registerServiceWorker();
+registerServiceWorker();

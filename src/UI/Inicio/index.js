@@ -1,26 +1,35 @@
 import React from "react";
+
+//Styles
 import classNames from "classnames";
 import { withStyles } from "@material-ui/core/styles";
 import withWidth, { isWidthUp } from "@material-ui/core/withWidth";
-import "./style.css";
-import _ from "lodash";
+import styles from "./styles";
 
 //Router
-import { Route, withRouter } from "react-router-dom";
-import { AnimatedSwitch } from "react-router-transition";
+import { withRouter } from "react-router-dom";
 
 //REDUX
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
 
 //Compontes
-import MenuIcon from "@material-ui/icons/Menu";
-import IconButton from "@material-ui/core/IconButton";
+import _ from "lodash";
+import Button from "@material-ui/core/Button";
+import Icon from "@material-ui/core/Icon";
+import { Typography, Grid } from "@material-ui/core";
 
 //Mis Componentes
-import MiDrawer from "./_DrawerNavigation/index";
 import MiToolbar from "@Componentes/MiToolbar";
-import Menu from "./menu";
+import MiContent from "@Componentes/MiContent";
+import CardEntidad from "./CardEntidad";
+import MiCard from "@Componentes/MiCard";
+
+//Recursos
+import ToolbarLogo from "@Resources/imagenes/toolbar_logo.png";
+
+//Rules
+import Rules_Entidad from "@Rules/Rules_Entidad";
 
 const mapStateToProps = state => {
   return {
@@ -39,16 +48,33 @@ const limite = "lg";
 class App extends React.Component {
   constructor(props) {
     super(props);
+    let paraMobile = !isWidthUp(limite, this.props.width);
 
-    let paraMobile = !isWidthUp(limite, props.width);
     this.state = {
       open: paraMobile ? false : true,
-      paraMobile: paraMobile
+      paraMobile: paraMobile,
+      data: [],
+      cargando: true,
+      error: undefined
     };
   }
 
   componentDidMount() {
     window.addEventListener("resize", this.onResize);
+
+    this.setState({ cargando: true }, () => {
+      Rules_Entidad.get()
+        .then(data => {
+          console.log(data);
+          this.setState({ error: undefined, data: data });
+        })
+        .catch(error => {
+          this.setState({ error: error });
+        })
+        .finally(() => {
+          this.setState({ cargando: false });
+        });
+    });
   }
 
   componentWillUnmount() {
@@ -65,40 +91,13 @@ class App extends React.Component {
     }, 500);
   };
 
-  onDrawerOpen = () => {
-    this.setState({ open: true });
-  };
-
-  onDrawerClose = () => {
-    this.setState({ open: false });
-  };
-
-  toggleDrawerOpen = () => {
-    if (this.props.cargando == true) return;
-    this.setState({ open: !this.state.open });
-  };
-
-  onDrawerItemClick = url => {
-    if (this.props.cargando == true) return;
-
-    let drawerOpen = this.state.open;
-    if (this.state.paraMobile == true) drawerOpen = false;
-
-    this.setState({ open: drawerOpen }, () => {
-      this.props.redireccionar(url);
-    });
-  };
-
-  onSubPaginaCargando = cargando => {
-    this.setState({ cargando: cargando });
+  onBotonEntidadClick = entidad => {
+    this.props.redireccionar("/NuevoTurno/" + entidad.id);
   };
 
   render() {
-    const { classes, width, location } = this.props;
-
-    let paginaActual = _.find(Menu, item => {
-      return item.url == location.pathname;
-    });
+    const { classes, width, location, usuario } = this.props;
+    if (usuario == undefined) return null;
 
     return (
       <React.Fragment>
@@ -106,29 +105,43 @@ class App extends React.Component {
           {/* Toolbar */}
           <MiToolbar
             paraMobile={this.state.paraMobile}
-            titulo={paginaActual.titulo}
-            cargando={this.props.cargando}
+            titulo={"Turnero Online"}
+            cargando={this.state.cargando}
             width={width}
-            leftIcon="menu"
-            leftIconClick={this.toggleDrawerOpen}
-          />
-
-          {/* Drawer */}
-          <MiDrawer
-            width={width}
-            paginaActual={paginaActual}
-            paraMobile={this.state.paraMobile}
-            onOpen={this.onDrawerOpen}
-            onClose={this.onDrawerClose}
-            onPaginaClick={this.onDrawerItemClick}
-            open={this.state.open}
+            renderLogo={this.renderLogo}
+            className={classes.toolbar}
           />
 
           {/* Contenido */}
           <div className={classNames(classes.main)}>
             <div className={classes.separadorToolbar} />
             <div className={classes.content}>
-              <Route path="/" component={Content} />
+              <MiContent className={classes.content}>
+                <Typography variant="headline" className={classes.titulo}>
+                  Mis turnos
+                </Typography>
+                <MiCard>
+                  <Typography>Aún no reservaste ningún turno</Typography>
+                </MiCard>
+
+                <div style={{ height: 56 }} />
+
+                <Typography variant="headline" className={classes.titulo}>
+                  Nuevo turno
+                </Typography>
+                <Grid container spacing={32}>
+                  {this.state.data.map(item => {
+                    return (
+                      <Grid item xs={12} md={6} key={item.id}>
+                        <CardEntidad
+                          data={item}
+                          onClick={this.onBotonEntidadClick}
+                        />
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              </MiContent>
             </div>
           </div>
         </div>
@@ -136,87 +149,24 @@ class App extends React.Component {
         <div
           className={classNames(
             classes.contentOverlayCargando,
-            this.props.cargando == true && classes.contentOverlayCargandoVisible
+            this.state.cargando == true && classes.contentOverlayCargandoVisible
           )}
         />
       </React.Fragment>
     );
   }
-}
 
-const Content = () => {
-  return (
-    <div className={styles.switchWrapper}>
-      <AnimatedSwitch
-        atEnter={{ opacity: 0, top: 20 }}
-        atLeave={{ opacity: 0, top: 0 }}
-        atActive={{ opacity: 1, top: 0 }}
-        className={"switch-wrapper"}
-      >
-        {Menu.map((item, index) => {
-          return (
-            <Route
-              key={index}
-              exact={item.exact}
-              path={item.url}
-              component={item.component}
-            />
-          );
-        })}
-      </AnimatedSwitch>
-    </div>
-  );
-};
+  renderLogo = () => {
+    const { classes, width, location, usuario } = this.props;
 
-const styles = theme => {
-  return {
-    root: {
-      display: "flex",
-      width: "100%",
-      height: "100vh",
-      backgroundColor: theme.palette.background.default
-    },
-    main: {
-      width: "100%",
-      display: "flex",
-      flexDirection: "column",
-      backgroundColor: theme.palette.background.default
-    },
-    separadorToolbar: theme.mixins.toolbar,
-    content: {
-      backgroundColor: theme.palette.background.default,
-      flex: 1,
-      width: "100%",
-      overflow: "auto",
-      "& > div": {
-        width: "100%",
-        height: "100%"
-      }
-    },
-    contentOverlayCargando: {
-      backgroundColor: "rgba(255,255,255,0.6)",
-      position: "absolute",
-      left: 0,
-      right: 0,
-      zIndex: theme.zIndex.drawer + 1,
-      top: 0,
-      bottom: 0,
-      opacity: 0,
-      pointerEvents: "none",
-      transition: "opacity 0.3s"
-    },
-    contentOverlayCargandoVisible: {
-      opacity: 1,
-      pointerEvents: "auto"
-    },
-    switchWrapper: {
-      backgroundColor: theme.palette.background.default,
-      position: "relative",
-      width: "100%",
-      flex: 1
-    }
+    return (
+      <div
+        className={classes.logoMuni}
+        style={{ backgroundImage: "url(" + ToolbarLogo + ")" }}
+      />
+    );
   };
-};
+}
 
 let componente = undefined;
 componente = withStyles(styles)(App);

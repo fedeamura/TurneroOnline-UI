@@ -13,6 +13,7 @@ import { AnimatedSwitch } from "react-router-transition";
 //REDUX
 import { connect } from "react-redux";
 import { ocultarAlerta } from "@Redux/Actions/alerta";
+import { login } from "@Redux/Actions/usuario";
 
 //Componentes
 import Snackbar from "@material-ui/core/Snackbar";
@@ -22,7 +23,14 @@ import CloseIcon from "@material-ui/icons/Close";
 
 //Mis componentes
 import Pagina404 from "@UI/_Pagina404";
-import Inicio from '@UI/Inicio';
+import Inicio from "@UI/Inicio";
+import ValidarToken from "@UI/ValidarToken";
+import NuevoTurno from "@UI/NuevoTurno";
+import NuevoTurnoTramites from "@UI/NuevoTurnoTramites";
+
+//Mis rules
+import Rules_Usuario from "@Rules/Rules_Usuario";
+import { push } from "connected-react-router";
 
 const mapStateToProps = state => {
   return {
@@ -33,6 +41,12 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   onAlertaClose: id => {
     dispatch(ocultarAlerta(id));
+  },
+  login: usuario => {
+    dispatch(login(usuario));
+  },
+  redireccionar: url => {
+    dispatch(push(url));
   }
 });
 
@@ -59,7 +73,42 @@ class App extends React.Component {
     this.state = {};
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    if (this.props.location.pathname == "/Token") return;
+
+    // debugger;
+    let token = localStorage.getItem("token");
+    if (token == undefined || token == null || token == "undefined") {
+      localStorage.removeItem("token");
+      window.location.href = window.Config.URL_LOGIN;
+      return;
+    }
+
+    Rules_Usuario.validarToken(token)
+      .then(resultado => {
+        if (resultado == false) {
+          localStorage.removeItem("token");
+          window.location.href = window.Config.URL_LOGIN;
+          return;
+        }
+
+        Rules_Usuario.datos(token)
+          .then(datos => {
+            this.props.login(datos);
+            this.props.redireccionar(
+              this.props.location.pathname + this.props.location.search
+            );
+          })
+          .catch(error => {
+            localStorage.removeItem("token");
+            window.location.href = window.Config.URL_LOGIN;
+          });
+      })
+      .catch(error => {
+        localStorage.removeItem("token");
+        window.location.href = window.Config.URL_LOGIN;
+      });
+  }
 
   render() {
     const { classes } = this.props;
@@ -78,7 +127,6 @@ class App extends React.Component {
 
     let base = "";
 
-    console.log(match);
     return (
       <main className={classes.content}>
         <AnimatedSwitch
@@ -87,7 +135,11 @@ class App extends React.Component {
           atActive={{ opacity: 1 }}
           className={"switch-wrapper"}
         >
-          <Route path={`${base}/Inicio`} component={Inicio} />
+          <Route exact path={`${base}/`} component={Inicio} />
+          <Route path={`${base}/Token`} component={ValidarToken} />
+          <Route exact path={`${base}/NuevoTurno`} component={NuevoTurno} />
+          <Route exact path={`${base}/NuevoTurno/:id`} component={NuevoTurnoTramites} />
+
           <Route component={Pagina404} />
         </AnimatedSwitch>
       </main>
