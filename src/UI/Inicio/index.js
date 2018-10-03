@@ -92,7 +92,7 @@ class App extends React.Component {
   };
 
   onBotonEntidadClick = entidad => {
-    this.props.redireccionar("/NuevoTurno/" + entidad.id);
+    this.props.redireccionar("/Entidad/" + entidad.id);
   };
 
   render() {

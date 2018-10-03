@@ -25,8 +25,9 @@ import CloseIcon from "@material-ui/icons/Close";
 import Pagina404 from "@UI/_Pagina404";
 import Inicio from "@UI/Inicio";
 import ValidarToken from "@UI/ValidarToken";
-import NuevoTurno from "@UI/NuevoTurno";
-import NuevoTurnoTramites from "@UI/NuevoTurnoTramites";
+import EntidadDetalle from "@UI/EntidadDetalle";
+import TurneroDetalle from "@UI/TurneroDetalle";
+import TurneroCalendario from "@UI/TurneroCalendario";
 
 //Mis rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -50,15 +51,15 @@ const mapDispatchToProps = dispatch => ({
   }
 });
 
-// Promise.prototype.finally = function(callback) {
-//   return this.then(
-//     value => this.constructor.resolve(callback()).then(() => value),
-//     reason =>
-//       this.constructor.resolve(callback()).then(() => {
-//         throw reason;
-//       })
-//   );
-// };
+Promise.prototype.finally = function(callback) {
+  return this.then(
+    value => this.constructor.resolve(callback()).then(() => value),
+    reason =>
+      this.constructor.resolve(callback()).then(() => {
+        throw reason;
+      })
+  );
+};
 
 String.prototype.toTitleCase = function() {
   return this.replace(/\w\S*/g, function(txt) {
@@ -95,9 +96,9 @@ class App extends React.Component {
         Rules_Usuario.datos(token)
           .then(datos => {
             this.props.login(datos);
-            this.props.redireccionar(
-              this.props.location.pathname + this.props.location.search
-            );
+            // this.props.redireccionar(
+            //   this.props.location.pathname + this.props.location.search
+            // );
           })
           .catch(error => {
             localStorage.removeItem("token");
@@ -108,6 +109,21 @@ class App extends React.Component {
         localStorage.removeItem("token");
         window.location.href = window.Config.URL_LOGIN;
       });
+
+    setInterval(() => {
+      Rules_Usuario.validarToken(token)
+        .then(resultado => {
+          if (resultado == false) {
+            localStorage.removeItem("token");
+            window.location.href = window.Config.URL_LOGIN;
+            return;
+          }
+        })
+        .catch(error => {
+          localStorage.removeItem("token");
+          window.location.href = window.Config.URL_LOGIN;
+        });
+    }, 5000);
   }
 
   render() {
@@ -129,16 +145,12 @@ class App extends React.Component {
 
     return (
       <main className={classes.content}>
-        <AnimatedSwitch
-          atEnter={{ opacity: 0 }}
-          atLeave={{ opacity: 0 }}
-          atActive={{ opacity: 1 }}
-          className={"switch-wrapper"}
-        >
+        <AnimatedSwitch atEnter={{ opacity: 0 }} atLeave={{ opacity: 0 }} atActive={{ opacity: 1 }} className={"switch-wrapper"}>
           <Route exact path={`${base}/`} component={Inicio} />
           <Route path={`${base}/Token`} component={ValidarToken} />
-          <Route exact path={`${base}/NuevoTurno`} component={NuevoTurno} />
-          <Route exact path={`${base}/NuevoTurno/:id`} component={NuevoTurnoTramites} />
+          <Route exact path={`${base}/Entidad/:id`} component={EntidadDetalle} />
+          <Route exact path={`${base}/Turnero/:id`} component={TurneroDetalle} />
+          <Route exact path={`${base}/TurneroCalendario/:id`} component={TurneroCalendario} />
 
           <Route component={Pagina404} />
         </AnimatedSwitch>
@@ -171,15 +183,8 @@ class App extends React.Component {
             style={{ backgroundColor: alerta.color }}
             aria-describedby="client-snackbar"
             message={
-              <span
-                id={"message-id" + alerta.id}
-                className={classes.snackMessage}
-              >
-                {alerta.icono != undefined && (
-                  <Icon className={classes.snackCustomIcon}>
-                    {alerta.icono}
-                  </Icon>
-                )}
+              <span id={"message-id" + alerta.id} className={classes.snackMessage}>
+                {alerta.icono != undefined && <Icon className={classes.snackCustomIcon}>{alerta.icono}</Icon>}
                 {alerta.texto}
               </span>
             }

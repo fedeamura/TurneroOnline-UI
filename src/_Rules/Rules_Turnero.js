@@ -1,8 +1,8 @@
 import _ from "lodash";
 
 const metodos = {
-  get: () => {
-    const url = window.Config.WS_TURNERO + "/v1/Entidad";
+  getDetalle: id => {
+    const url = window.Config.WS_TURNERO + "/v1/TurneroPorTramite/Detalle/" + id;
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "GET",
@@ -26,16 +26,17 @@ const metodos = {
         });
     });
   },
-  getDetalle: id => {
-    const url = window.Config.WS_TURNERO + "/v1/Entidad/Detalle/" + id;
+  getTurnos: comando => {
+    const url = window.Config.WS_TURNERO + "/v1/TurneroPorTramite/Turnos";
     return new Promise((resolve, reject) => {
       fetch(url, {
-        method: "GET",
+        method: "PUT",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
           Token: localStorage.getItem("token")
-        }
+        },
+        body: JSON.stringify(comando)
       })
         .then(data => data.json())
         .then(data => {
