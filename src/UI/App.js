@@ -110,7 +110,7 @@ class App extends React.Component {
         window.location.href = window.Config.URL_LOGIN;
       });
 
-    setInterval(() => {
+    this.intervalo = setInterval(() => {
       Rules_Usuario.validarToken(token)
         .then(resultado => {
           if (resultado == false) {
@@ -124,6 +124,10 @@ class App extends React.Component {
           window.location.href = window.Config.URL_LOGIN;
         });
     }, 5000);
+  }
+
+  componentWillUnmount() {
+    this.intervalo && clearInterval(this.intervalo);
   }
 
   render() {

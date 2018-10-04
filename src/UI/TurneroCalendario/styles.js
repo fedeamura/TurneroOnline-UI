@@ -86,6 +86,12 @@ const styles = theme => {
     contenedorBotones: {
       display: "flex",
       justifyContent: "flex-end"
+    },
+    diaSeleccionado: {
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+      backgroundColor: "red"
     }
   };
 };
