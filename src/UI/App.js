@@ -184,7 +184,7 @@ class App extends React.Component {
               <React.Fragment> */}
           <Route exact path={`${base}/`} component={Inicio} />
           <Route exact path={`${base}/Entidad/:id`} component={login ? EntidadDetalle : null} />
-          <Route exact path={`${base}/Turnero/:id`} component={login ? TurneroDetalle : null} />
+          <Route exact path={`${base}/TurneroDetalle/:id`} component={login ? TurneroDetalle : null} />
           <Route exact path={`${base}/TurneroCalendario/:id`} component={login ? TurneroCalendario : null} />
           <Route component={Pagina404} />
           {/* </React.Fragment> */}

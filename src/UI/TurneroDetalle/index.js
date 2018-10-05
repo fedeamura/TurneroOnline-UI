@@ -74,6 +74,10 @@ class TurneroDetalle extends React.Component {
     });
   }
 
+  onBotonTurneroCalendarioClick = () => {
+    this.props.redirigir("/TurneroCalendario/" + this.state.id);
+  };
+
   render() {
     const { classes } = this.props;
 
@@ -231,7 +235,7 @@ class TurneroDetalle extends React.Component {
                     {/* Botones */}
                     <Grid item xs={12}>
                       <div className={classes.contenedorBotones}>
-                        <Button variant="raised" color="primary">
+                        <Button variant="raised" color="primary" onClick={this.onBotonTurneroCalendarioClick}>
                           Ver turnos disponibles
                         </Button>
                       </div>

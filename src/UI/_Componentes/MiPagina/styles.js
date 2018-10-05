@@ -28,8 +28,8 @@ const styles = theme => ({
       transition: "opacity 0.3s"
     },
     contentOverlayCargandoVisible: {
-      opacity: 1
-      // pointerEvents: 'auto',
+      opacity: 1,
+      pointerEvents: 'auto',
     }
   });
 

@@ -97,10 +97,16 @@ class EntidadDetalle extends React.Component {
     this.setState({ turneroSeleccionadoEnTramite: turneroSeleccionadoEnTramite });
   };
 
-  onBotonTurneroClick = e => {
+  onBotonTurneroDetalleClick = e => {
     let idTramite = e.currentTarget.attributes.itemprop.value;
     let idTurnero = this.state.turneroSeleccionadoEnTramite[idTramite];
-    this.props.redirigir("/Turnero/" + idTurnero);
+    this.props.redirigir("/TurneroDetalle/" + idTurnero);
+  };
+
+  onBotonTurneroCalendarioClick = e => {
+    let idTramite = e.currentTarget.attributes.itemprop.value;
+    let idTurnero = this.state.turneroSeleccionadoEnTramite[idTramite];
+    this.props.redirigir("/TurneroCalendario/" + idTurnero);
   };
 
   render() {
@@ -199,10 +205,20 @@ class EntidadDetalle extends React.Component {
                                   </FormControl>
 
                                   <div className={classes.contenedorBotonesTramite}>
-                                    <Button itemProp={tramite.id} color="primary" variant="outlined" onClick={this.onBotonTurneroClick}>
+                                    <Button
+                                      itemProp={tramite.id}
+                                      color="primary"
+                                      variant="outlined"
+                                      onClick={this.onBotonTurneroDetalleClick}
+                                    >
                                       Más información
                                     </Button>
-                                    <Button itemProp={tramite.id} color="primary" variant="raised" onClick={this.onBotonTurneroClick}>
+                                    <Button
+                                      itemProp={tramite.id}
+                                      color="primary"
+                                      variant="raised"
+                                      onClick={this.onBotonTurneroCalendarioClick}
+                                    >
                                       Reservar turno
                                     </Button>
                                   </div>

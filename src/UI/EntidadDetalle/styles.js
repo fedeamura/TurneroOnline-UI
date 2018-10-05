@@ -63,7 +63,10 @@ const styles = theme => {
     contenedorBotonesTramite: {
       display: "flex",
       justifyContent: "flex-end",
-      marginTop: "16px"
+      marginTop: "16px",
+      "& button:not(:last-child)": {
+        marginRight: "8px"
+      }
     }
   };
 };

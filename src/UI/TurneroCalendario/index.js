@@ -18,25 +18,34 @@ import { mostrarAlerta } from "@Redux/Actions/alerta";
 //Componentes
 import _ from "lodash";
 import BigCalendar from "react-big-calendar";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Dialog from "@material-ui/core/Dialog";
+import Button from "@material-ui/core/Button";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 //Mis componentes
 import MiPagina from "@Componentes/MiPagina";
+import MiContent from "@Componentes/MiContent";
+import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 
 //Recursos
 import ToolbarLogo from "@Resources/imagenes/toolbar_logo.png";
 
 //Rules
 import Rules_Turnero from "@Rules/Rules_Turnero";
-import { IconButton, Icon, Typography } from "../../../node_modules/@material-ui/core";
+import { IconButton, Icon, Typography, Grid } from "../../../node_modules/@material-ui/core";
 
 //Globalizacion
 import moment from "moment";
 import "moment/locale/es";
+import { min } from "date-fns/esm/fp";
 moment.locale("es");
 const localizer = BigCalendar.momentLocalizer(moment);
 
 const mapStateToProps = state => {
-  return {};
+  return { usuario: state.Usuario.usuario };
 };
 
 const mapDispatchToProps = dispatch => ({
@@ -57,15 +66,30 @@ class TurneroCalendario extends React.Component {
 
     this.state = {
       id: props.match.params.id,
+      infoTurnero: undefined,
       dataDelMes: undefined,
       mesSeleccionado: new Date(),
       diaSeleccionado: undefined,
-      eventos: []
+      eventos: [],
+      primeraVez: true,
+      alertaDia: undefined,
+      // cargando: true
     };
   }
 
   componentDidMount() {
-    this.buscarInfoDelMes(new Date().getMonth() + 1, new Date().getFullYear());
+    this.setState({ cargando: true }, () => {
+      Rules_Turnero.getDetalle(this.state.id)
+        .then(data => {
+          console.log(data);
+          this.setState({ infoTurnero: data });
+          this.buscarInfoDelMes(new Date().getMonth() + 1, new Date().getFullYear());
+        })
+        .catch(error => {
+          console.log(error);
+          this.setState({ error: error, cargando: false });
+        });
+    });
   }
 
   buscarInfoDelMes = (mes, año) => {
@@ -105,6 +129,20 @@ class TurneroCalendario extends React.Component {
       })
         .then(data => {
           console.log(data);
+
+          if (this.state.primeraVez == true) {
+            this.setState({ primeraVez: false });
+
+            if (
+              _.filter(data, item => {
+                return item.estadoKeyValue == 1;
+              }) != undefined
+            ) {
+              let diaMinimo = _.min(data, "fecha", "inicio");
+              let partesDia = diaMinimo.fecha.split("T")[0].split("-");
+              this.onDiaClick(new Date(partesDia[0], parseInt(partesDia[1]) - 1, partesDia[2]));
+            }
+          }
           this.setState({ dataDelMes: data });
         })
         .catch(error => {
@@ -128,9 +166,18 @@ class TurneroCalendario extends React.Component {
       return;
     }
 
+    let mesActual = this.state.mesSeleccionado.getMonth();
+    if (e.getMonth() != this.state.mesSeleccionado.getMonth()) {
+      if (e.getMonth() > mesActual) {
+        document.getElementById("btn_MesSiguiente").click();
+      } else {
+        document.getElementById("btn_MesAnterior").click();
+      }
+    }
+
     this.setState(
       {
-        panelTurnosVisible: false,
+        calendarioDiaVisible: false,
         diaSeleccionado: e
       },
       () => {
@@ -176,7 +223,6 @@ class TurneroCalendario extends React.Component {
           let agrupados = _.groupBy(eventos, "inicio", "duracion", "estadoKeyValue");
 
           let resultado = [];
-          let id = 0;
           for (var property in agrupados) {
             if (agrupados.hasOwnProperty(property)) {
               let item = agrupados[property];
@@ -194,9 +240,8 @@ class TurneroCalendario extends React.Component {
                 fechaFin.setMinutes(item[0].inicio * 5);
                 fechaFin.setMinutes(fechaFin.getMinutes() + item[0].duracion * 5);
 
-                id = id + 1;
                 resultado.push({
-                  id: id,
+                  id: item[0].id,
                   start: fechaInicio,
                   end: fechaFin,
                   title: "Turno disponible"
@@ -205,7 +250,13 @@ class TurneroCalendario extends React.Component {
             }
           }
 
-          this.setState({ eventos: resultado, panelTurnosVisible: true });
+          let alertaDia = undefined;
+          if (resultado.length == 0) {
+            alertaDia = "No hay turnos disponibles para el día seleccionado";
+          }
+
+          document.getElementsByClassName("rbc-time-content")[0].scrollTop = 0;
+          this.setState({ eventos: resultado, calendarioDiaVisible: true, alertaDia: alertaDia });
         }, 300);
       }
     );
@@ -214,12 +265,12 @@ class TurneroCalendario extends React.Component {
   onBotonMesAnteriorClick = () => {
     let mesActual = this.state.mesSeleccionado;
     mesActual.setMonth(mesActual.getMonth() - 1);
-    this.setState({ mesSeleccionado: mesActual });
+    this.setState({ mesSeleccionado: mesActual, diaSeleccionado: undefined, calendarioDiaVisible: false });
 
-    if (mesActual.getMonth() < new Date().getMonth()) {
-      this.props.mostrarAlerta("No puede sacar un turno en una fecha menor a la actual");
-      return;
-    }
+    // if (mesActual.getMonth() < new Date().getMonth()) {
+    //   this.props.mostrarAlerta("No puede sacar un turno en una fecha menor a la actual");
+    //   return;
+    // }
 
     this.buscarInfoDelMes(mesActual.getMonth() + 1, mesActual.getFullYear());
   };
@@ -227,8 +278,50 @@ class TurneroCalendario extends React.Component {
   onBotonMesSiguienteClick = () => {
     let mesActual = this.state.mesSeleccionado;
     mesActual.setMonth(mesActual.getMonth() + 1);
-    this.setState({ mesSeleccionado: mesActual });
+    this.setState({ mesSeleccionado: mesActual, diaSeleccionado: undefined, calendarioDiaVisible: false });
     this.buscarInfoDelMes(mesActual.getMonth() + 1, mesActual.getFullYear());
+  };
+
+  onBotonCancelarDiaSeleccionadoClick = () => {
+    this.setState({ calendarioDiaVisible: false }, () => {
+      setTimeout(() => {
+        this.setState({ diaSeleccionado: undefined });
+      }, 300);
+    });
+  };
+
+  onCalendarioDiaEventoClick = e => {
+    console.log(e);
+    this.setState({ turnoSeleccionado: e, dialogoTurnoConfirmacionVisible: true });
+  };
+
+  onDialogoTurnoClose = () => {
+    this.setState({ dialogoTurnoConfirmacionVisible: false });
+  };
+
+  reservarTurno = () => {
+    this.setState(
+      {
+        reservandoTurno: true,
+        dialogoTurnoConfirmacionVisible: false,
+        dialogoTurnoExitoVisible: true
+      },
+      () => {
+        setTimeout(() => {
+          this.setState({
+            reservandoTurno: false,
+            dialogoTurnoConfirmacionVisible: false,
+            dialogoTurnoExitoVisible: true
+          });
+        }, 2000);
+      }
+    );
+  };
+
+  onBotonIrInicioClick = () => {
+    this.setState({ dialogoTurnoExitoVisible: false }, () => {
+      this.props.redirigir("/");
+    });
   };
 
   render() {
@@ -245,16 +338,35 @@ class TurneroCalendario extends React.Component {
           toolbarLeftIconClick={this.props.goBack}
           contentClassName={classes.paginaContent}
         >
+          <MiContent className="contenedor">
+            <Grid container spacing={32}>
+              <Grid item xs={12} md={5}>
+                {this.renderCalendarioMes()}
+              </Grid>
+
+              <Grid item xs={12} md={7} className={classNames("colColendarioDia", this.state.calendarioDiaVisible && "visible")}>
+                {this.renderCalendarioDia()}
+              </Grid>
+            </Grid>
+
+            {this.renderDialogoTurnoConfirmacion()}
+            {this.renderDialogoTurnoExito()}
+          </MiContent>
+        </MiPagina>
+      </React.Fragment>
+    );
+  }
+
+  renderCalendarioMes() {
+    const { classes } = this.props;
+
+    return (
+      <div className={classNames("contenedorCalendarioMes")}>
+        <div className={classNames("contenedorCalendarioMesContent")}>
           <BigCalendar
             view="month"
-            // toolbar={false}
+            className={classNames("calendarioMes")}
             views={{ month: true }}
-            style={{
-              height: "300px",
-              width: "300px",
-              maxWidth: "300px",
-              minWidth: "300px"
-            }}
             culture="es"
             localizer={localizer}
             onDrillDown={this.onDiaClick}
@@ -314,6 +426,12 @@ class TurneroCalendario extends React.Component {
                     deshabilitado = true;
                   }
 
+                  if (this.state.cargando == true) {
+                    seleccionado = false;
+                    conTurnos = false;
+                    deshabilitado = false;
+                  }
+
                   return (
                     <CalendarioMes_Dia
                       deshabilitado={deshabilitado}
@@ -327,10 +445,52 @@ class TurneroCalendario extends React.Component {
               }
             }}
           />
+        </div>
 
+        <div className={classNames("contenedorInfo")}>
+          <Icon>info_outline</Icon>
+          <Typography variant="body1">Los dias con resaltados en verde poseen turnos disponibles para reservar</Typography>
+        </div>
+      </div>
+    );
+  }
+
+  renderCalendarioDia() {
+    const { classes } = this.props;
+
+    let diaSeleccionado = "";
+    if (this.state.diaSeleccionado != undefined) {
+      let fecha = this.state.diaSeleccionado;
+      let dia = fecha.getDate();
+      if (dia < 9) dia = "0" + dia;
+      let mes = fecha.getMonth() + 1;
+      if (mes < 9) mes = "0" + mes;
+      let año = fecha.getFullYear();
+      diaSeleccionado = dia + "/" + mes + "/" + año;
+    }
+
+    return (
+      <div className={classNames("contenedorCalendarioDia")}>
+        <div>
+          {/* Encabezado  */}
+          <div className={classNames("encabezado")}>
+            <Typography variant="headline">Turnos disponibles para el dia {diaSeleccionado}</Typography>
+            <IconButton onClick={this.onBotonCancelarDiaSeleccionadoClick}>
+              <Icon>clear</Icon>
+            </IconButton>
+          </div>
+
+          {/* Mensaje sin eventos */}
+          {this.state.alertaDia != undefined && (
+            <div className={classNames("contenedorSinEventos")}>
+              <Typography variant="body2">{this.state.alertaDia}</Typography>
+            </div>
+          )}
+
+          {/* Calendario */}
           <BigCalendar
             view="day"
-            className={classNames("panelTurnos", this.state.panelTurnosVisible && "visible")}
+            className={classNames("calendarioDia")}
             date={this.state.diaSeleccionado}
             toolbar={false}
             onSelectSlot={this.onSelectSlot}
@@ -338,23 +498,133 @@ class TurneroCalendario extends React.Component {
             views={{ day: true }}
             localizer={localizer}
             events={this.state.eventos}
-            components={{
-              day: {
-                header: () => {
-                  return <CalendarioPanel_Evento />;
-                },
-                event: () => {
-                  return <CalendarioPanel_Evento />;
-                }
-              }
-            }}
+            step={15}
+            timeslots={1}
+            eventPropGetter={this.eventStyleGetter}
+            onSelectEvent={this.onCalendarioDiaEventoClick}
             startAccessor="start"
             endAccessor="end"
           />
-        </MiPagina>
-      </React.Fragment>
+        </div>
+      </div>
     );
   }
+
+  renderDialogoTurnoConfirmacion() {
+    if (this.state.turnoSeleccionado == undefined) return null;
+    if (this.state.turnoRegistrado == true) return null;
+
+    let fecha = this.state.turnoSeleccionado.start;
+    let dia = fecha.getDate();
+    if (dia < 9) dia = "0" + dia;
+    let mes = fecha.getMonth() + 1;
+    if (mes < 9) mes = "0" + mes;
+    let año = fecha.getFullYear();
+    let horas = fecha.getHours();
+    if (horas < 9) horas = "0" + horas;
+    let minutos = fecha.getMinutes();
+    if (minutos < 9) minutos = "0" + minutos;
+    let fechaString = dia + "/" + mes + "/" + año;
+    let horaString = horas + ":" + minutos;
+    return (
+      <Dialog onClose={this.onDialogoTurnoClose} open={this.state.dialogoTurnoConfirmacionVisible}>
+        <DialogTitle id="simple-dialog-title">Reservar turno</DialogTitle>
+
+        <DialogContent>
+          <Typography variant="body1">¿Desea reservar el turno seleccionado?</Typography>
+          {/* Tramite */}
+          <div className="dialogo_info">
+            <Typography variant="body2">Tramite: </Typography>
+            <Typography variant="body1">{this.state.infoTurnero.tramiteNombre}</Typography>
+          </div>
+          {/* Ubicacion */}
+          {this.state.infoTurnero.ubicaciones != undefined && (
+            <div className="dialogo_info">
+              <Typography variant="body2">Ubicación: </Typography>
+              <Typography variant="body1">{this.state.infoTurnero.ubicaciones[0].direccion}</Typography>
+            </div>
+          )}
+          {/* Fecha */}
+          <div className="dialogo_info">
+            <Typography variant="body2">Fecha: </Typography>
+            <Typography variant="body1">{fechaString}</Typography>
+          </div>
+          {/* Hora */}
+          <div className="dialogo_info">
+            <Typography variant="body2">Hora: </Typography>
+            <Typography variant="body1">{horaString}</Typography>
+          </div>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={this.onDialogoTurnoClose}>Cancelar</Button>
+          <Button onClick={this.reservarTurno} color="primary" autoFocus>
+            Reservar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
+  renderDialogoTurnoExito() {
+    if (this.state.turnoSeleccionado == undefined) return null;
+    if (this.state.turnoRegistrado == true) return null;
+
+    let fecha = this.state.turnoSeleccionado.start;
+    let dia = fecha.getDate();
+    if (dia < 9) dia = "0" + dia;
+    let mes = fecha.getMonth() + 1;
+    if (mes < 9) mes = "0" + mes;
+    let año = fecha.getFullYear();
+    let horas = fecha.getHours();
+    if (horas < 9) horas = "0" + horas;
+    let minutos = fecha.getMinutes();
+    if (minutos < 9) minutos = "0" + minutos;
+    let fechaString = dia + "/" + mes + "/" + año;
+    let horaString = horas + ":" + minutos;
+    return (
+      <Dialog open={this.state.dialogoTurnoExitoVisible}>
+        {this.state.reservandoTurno == true && (
+          <DialogContent>
+            <CircularProgress color="primary" />
+          </DialogContent>
+        )}
+        {this.state.reservandoTurno == false && (
+          <DialogContent>
+            <MiPanelMensaje
+              lottieExito
+              mensaje="Turno reservado exitosamente"
+              detalle={"Se ha enviado un e-mail a " + this.props.usuario.email + " con el comprobante del turno"}
+            />
+          </DialogContent>
+        )}
+
+        {this.state.reservandoTurno == false && (
+          <DialogActions>
+            {/* <Button onClick={this.onDialogoTurnoClose}>Cancelar</Button> */}
+            <Button onClick={this.onBotonIrInicioClick} color="primary" autoFocus>
+              Ir a inicio
+            </Button>
+          </DialogActions>
+        )}
+      </Dialog>
+    );
+  }
+
+  eventStyleGetter = (event, start, end, isSelected) => {
+    var style = {
+      backgroundColor: "#149257",
+      borderRadius: "0px",
+      color: "white",
+      border: "none",
+      borderBottom: "1px solid rgba(255,255,255,0.2)",
+      display: "block"
+    };
+
+    return {
+      style: style
+    };
+  };
 
   renderToolbarLogo = () => {
     const { classes } = this.props;
@@ -426,10 +696,10 @@ class CalendarioMes_Encabezado extends React.PureComponent {
         <Typography className={classNames("titulo")} variant="headline">
           {this.props.props.label}
         </Typography>
-        <IconButton onClick={this.onBotonBackClick}>
+        <IconButton onClick={this.onBotonBackClick} id="btn_MesAnterior">
           <Icon>keyboard_arrow_left</Icon>
         </IconButton>
-        <IconButton onClick={this.onBotonNextClick}>
+        <IconButton onClick={this.onBotonNextClick} id="btn_MesSiguiente">
           <Icon>keyboard_arrow_right</Icon>
         </IconButton>
       </div>
