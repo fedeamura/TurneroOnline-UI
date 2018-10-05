@@ -46,6 +46,7 @@
     "react-css-transition-replace": "^3.0.3",
     "react-dev-utils": "^5.0.2",
     "react-dom": "^16.4.2",
+    "react-globalize": "^1.0.0",
     "react-google-recaptcha": "^1.0.2",
     "react-hot-loader": "^4.3.8",
     "react-lottie": "^1.2.3",

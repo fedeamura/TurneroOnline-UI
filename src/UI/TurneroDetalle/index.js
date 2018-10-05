@@ -14,8 +14,8 @@ import { goBack, push } from "connected-react-router";
 
 //Componentes
 import { Grid, Typography, Button } from "@material-ui/core";
-import _ from "lodash";
 import Avatar from "@material-ui/core/Avatar";
+// import _ from "lodash";
 
 //Mis componentes
 import MiContent from "@Componentes/MiContent";

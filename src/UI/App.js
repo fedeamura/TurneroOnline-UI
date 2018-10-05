@@ -7,7 +7,7 @@ import "./style.css";
 
 //Router
 import { withRouter } from "react-router-dom";
-import { Route, Redirect } from "react-router-dom";
+import { Route } from "react-router-dom";
 import { AnimatedSwitch } from "react-router-transition";
 
 //REDUX
@@ -18,7 +18,7 @@ import { login } from "@Redux/Actions/usuario";
 //Componentes
 import Snackbar from "@material-ui/core/Snackbar";
 import SnackbarContent from "@material-ui/core/SnackbarContent";
-import { IconButton, Icon } from "@material-ui/core";
+import { IconButton, Icon, Typography } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 
 //Mis componentes
@@ -35,6 +35,7 @@ import { push } from "connected-react-router";
 
 const mapStateToProps = state => {
   return {
+    usuario: state.Usuario.usuario,
     alertas: state.Alerta.alertas
   };
 };
@@ -71,7 +72,9 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      validandoToken: false
+    };
   }
 
   componentDidMount() {
@@ -85,32 +88,45 @@ class App extends React.Component {
       return;
     }
 
-    Rules_Usuario.validarToken(token)
-      .then(resultado => {
-        if (resultado == false) {
-          localStorage.removeItem("token");
-          window.location.href = window.Config.URL_LOGIN;
-          return;
-        }
-
-        Rules_Usuario.datos(token)
-          .then(datos => {
-            this.props.login(datos);
-            // this.props.redireccionar(
-            //   this.props.location.pathname + this.props.location.search
-            // );
-          })
-          .catch(error => {
+    this.setState({ validandoToken: true }, () => {
+      Rules_Usuario.validarToken(token)
+        .then(resultado => {
+          if (resultado == false) {
             localStorage.removeItem("token");
             window.location.href = window.Config.URL_LOGIN;
-          });
-      })
-      .catch(error => {
+            return;
+          }
+
+          Rules_Usuario.datos(token)
+            .then(datos => {
+              this.props.login(datos);
+              // this.props.redireccionar(
+              //   this.props.location.pathname + this.props.location.search
+              // );
+            })
+            .catch(error => {
+              localStorage.removeItem("token");
+              window.location.href = window.Config.URL_LOGIN;
+            });
+        })
+        .catch(error => {
+          localStorage.removeItem("token");
+          window.location.href = window.Config.URL_LOGIN;
+        })
+        .finally(() => {
+          this.setState({ validandoToken: false });
+        });
+    });
+
+    //Cada 5 seg valido el token
+    this.intervalo = setInterval(() => {
+      let token = localStorage.getItem("token");
+      if (token == undefined || token == null || token == "undefined") {
         localStorage.removeItem("token");
         window.location.href = window.Config.URL_LOGIN;
-      });
+        return;
+      }
 
-    this.intervalo = setInterval(() => {
       Rules_Usuario.validarToken(token)
         .then(resultado => {
           if (resultado == false) {
@@ -133,11 +149,19 @@ class App extends React.Component {
   render() {
     const { classes } = this.props;
 
+    const procesandoLogin = this.state.validandoToken == true;
+
     return (
       <div className={classes.root}>
         <CssBaseline />
         {this.renderContent()}
         {this.renderAlertas()}
+
+        {/* {procesandoLogin && (
+          <div style={{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0, zIndex: 2000, background: "red" }}>
+            <Typography>Procesando login</Typography>
+          </div>
+        )} */}
       </div>
     );
   }
@@ -147,16 +171,24 @@ class App extends React.Component {
 
     let base = "";
 
+    const login = this.state.validandoToken == false && this.props.usuario != undefined;
+
     return (
       <main className={classes.content}>
         <AnimatedSwitch atEnter={{ opacity: 0 }} atLeave={{ opacity: 0 }} atActive={{ opacity: 1 }} className={"switch-wrapper"}>
-          <Route exact path={`${base}/`} component={Inicio} />
           <Route path={`${base}/Token`} component={ValidarToken} />
-          <Route exact path={`${base}/Entidad/:id`} component={EntidadDetalle} />
-          <Route exact path={`${base}/Turnero/:id`} component={TurneroDetalle} />
-          <Route exact path={`${base}/TurneroCalendario/:id`} component={TurneroCalendario} />
 
+          {/* Todas las paginas de aca abajo necesitan usuario logeado */}
+          {/* {this.state.validandoToken == false &&
+            this.props.usuario != undefined && (
+              <React.Fragment> */}
+          <Route exact path={`${base}/`} component={Inicio} />
+          <Route exact path={`${base}/Entidad/:id`} component={login ? EntidadDetalle : null} />
+          <Route exact path={`${base}/Turnero/:id`} component={login ? TurneroDetalle : null} />
+          <Route exact path={`${base}/TurneroCalendario/:id`} component={login ? TurneroCalendario : null} />
           <Route component={Pagina404} />
+          {/* </React.Fragment> */}
+          {/* )} */}
         </AnimatedSwitch>
       </main>
     );

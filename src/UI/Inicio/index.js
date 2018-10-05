@@ -32,6 +32,8 @@ import ToolbarLogo from "@Resources/imagenes/toolbar_logo.png";
 import Rules_Entidad from "@Rules/Rules_Entidad";
 
 const mapStateToProps = state => {
+  console.log("mapStateToProps " + (state.Usuario.usuario != undefined));
+
   return {
     usuario: state.Usuario.usuario,
     cargando: state.MainContent.cargando
@@ -57,9 +59,12 @@ class App extends React.Component {
       cargando: true,
       error: undefined
     };
+
+    console.log("constructor");
   }
 
   componentDidMount() {
+    console.log("did mount");
     window.addEventListener("resize", this.onResize);
 
     this.setState({ cargando: true }, () => {
@@ -133,10 +138,7 @@ class App extends React.Component {
                   {this.state.data.map(item => {
                     return (
                       <Grid item xs={12} md={6} key={item.id}>
-                        <CardEntidad
-                          data={item}
-                          onClick={this.onBotonEntidadClick}
-                        />
+                        <CardEntidad data={item} onClick={this.onBotonEntidadClick} />
                       </Grid>
                     );
                   })}
@@ -146,12 +148,7 @@ class App extends React.Component {
           </div>
         </div>
 
-        <div
-          className={classNames(
-            classes.contentOverlayCargando,
-            this.state.cargando == true && classes.contentOverlayCargandoVisible
-          )}
-        />
+        <div className={classNames(classes.contentOverlayCargando, this.state.cargando == true && classes.contentOverlayCargandoVisible)} />
       </React.Fragment>
     );
   }
@@ -159,12 +156,7 @@ class App extends React.Component {
   renderLogo = () => {
     const { classes, width, location, usuario } = this.props;
 
-    return (
-      <div
-        className={classes.logoMuni}
-        style={{ backgroundImage: "url(" + ToolbarLogo + ")" }}
-      />
-    );
+    return <div className={classes.logoMuni} style={{ backgroundImage: "url(" + ToolbarLogo + ")" }} />;
   };
 }
 

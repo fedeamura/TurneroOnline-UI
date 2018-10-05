@@ -58,6 +58,7 @@ class MiToolbar extends React.Component {
     if (this.props.cargando) return;
     this.setState({ anchorPopupUsuario: null });
     this.props.cerrarSesion();
+    localStorage.removeItem("token");
     window.location.href = window.Config.URL_LOGIN;
   };
 
