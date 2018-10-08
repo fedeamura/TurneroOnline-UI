@@ -28,6 +28,7 @@ import ValidarToken from "@UI/ValidarToken";
 import EntidadDetalle from "@UI/EntidadDetalle";
 import TurneroDetalle from "@UI/TurneroDetalle";
 import TurneroCalendario from "@UI/TurneroCalendario";
+import TurnoDetalle from "@UI/TurnoDetalle";
 
 //Mis rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -179,16 +180,12 @@ class App extends React.Component {
           <Route path={`${base}/Token`} component={ValidarToken} />
 
           {/* Todas las paginas de aca abajo necesitan usuario logeado */}
-          {/* {this.state.validandoToken == false &&
-            this.props.usuario != undefined && (
-              <React.Fragment> */}
-          <Route exact path={`${base}/`} component={Inicio} />
+          <Route exact path={`${base}/`} component={login ? Inicio : null} />
           <Route exact path={`${base}/Entidad/:id`} component={login ? EntidadDetalle : null} />
           <Route exact path={`${base}/TurneroDetalle/:id`} component={login ? TurneroDetalle : null} />
           <Route exact path={`${base}/TurneroCalendario/:id`} component={login ? TurneroCalendario : null} />
+          <Route exact path={`${base}/TurnoDetalle/:id`} component={login ? TurnoDetalle : null} />
           <Route component={Pagina404} />
-          {/* </React.Fragment> */}
-          {/* )} */}
         </AnimatedSwitch>
       </main>
     );

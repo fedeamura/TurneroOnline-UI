@@ -24,6 +24,7 @@ import Button from "@material-ui/core/Button";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { IconButton, Icon, Typography, Grid } from "@material-ui/core";
 
 //Mis componentes
 import MiPagina from "@Componentes/MiPagina";
@@ -35,13 +36,13 @@ import ToolbarLogo from "@Resources/imagenes/toolbar_logo.png";
 
 //Rules
 import Rules_Turnero from "@Rules/Rules_Turnero";
-import { IconButton, Icon, Typography, Grid } from "../../../node_modules/@material-ui/core";
+import Rules_Turno from "@Rules/Rules_Turno";
 
 //Globalizacion
 import moment from "moment";
 import "moment/locale/es";
-import { min } from "date-fns/esm/fp";
 moment.locale("es");
+
 const localizer = BigCalendar.momentLocalizer(moment);
 
 const mapStateToProps = state => {
@@ -73,7 +74,9 @@ class TurneroCalendario extends React.Component {
       eventos: [],
       primeraVez: true,
       alertaDia: undefined,
-      // cargando: true
+
+      dialogoErrorReservandoVisible: false,
+      errorReservando: undefined
     };
   }
 
@@ -304,16 +307,28 @@ class TurneroCalendario extends React.Component {
       {
         reservandoTurno: true,
         dialogoTurnoConfirmacionVisible: false,
-        dialogoTurnoExitoVisible: true
+        dialogoTurnoExitoVisible: true,
+        dialogoErrorReservandoVisible: false
       },
       () => {
-        setTimeout(() => {
-          this.setState({
-            reservandoTurno: false,
-            dialogoTurnoConfirmacionVisible: false,
-            dialogoTurnoExitoVisible: true
+        Rules_Turno.reservar(this.state.turnoSeleccionado.id)
+          .then(() => {
+            this.setState({
+              reservandoTurno: false,
+              dialogoTurnoConfirmacionVisible: false,
+              dialogoTurnoExitoVisible: true
+            });
+          })
+          .catch(error => {
+            console.log(error);
+
+            this.setState({
+              dialogoTurnoExitoVisible: false,
+              dialogoTurnoConfirmacionVisible: false,
+              errorReservando: error,
+              dialogoErrorReservandoVisible: true
+            });
           });
-        }, 2000);
       }
     );
   };
@@ -322,6 +337,15 @@ class TurneroCalendario extends React.Component {
     this.setState({ dialogoTurnoExitoVisible: false }, () => {
       this.props.redirigir("/");
     });
+  };
+
+  onDialogoErrorReservandoClose = () => {
+    this.setState({ dialogoErrorReservandoVisible: false });
+  };
+
+  onBotonReinterarReservarClick = () => {
+    this.setState({ dialogoErrorReservandoVisible: false });
+    this.reservarTurno();
   };
 
   render() {
@@ -351,6 +375,7 @@ class TurneroCalendario extends React.Component {
 
             {this.renderDialogoTurnoConfirmacion()}
             {this.renderDialogoTurnoExito()}
+            {this.renderDialogoErrorReservando()}
           </MiContent>
         </MiPagina>
       </React.Fragment>
@@ -607,6 +632,22 @@ class TurneroCalendario extends React.Component {
             </Button>
           </DialogActions>
         )}
+      </Dialog>
+    );
+  }
+
+  renderDialogoErrorReservando() {
+    return (
+      <Dialog open={this.state.dialogoErrorReservandoVisible}>
+        <DialogContent>
+          <Typography variant="body1">{this.state.errorReservando}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.onDialogoErrorReservandoClose}>Cancelar</Button>
+          <Button onClick={this.onBotonReinterarReservarClick} color="primary" autoFocus>
+            Reintentar
+          </Button>
+        </DialogActions>
       </Dialog>
     );
   }
