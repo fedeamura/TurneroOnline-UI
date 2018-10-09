@@ -29,6 +29,7 @@ import EntidadDetalle from "@UI/EntidadDetalle";
 import TurneroDetalle from "@UI/TurneroDetalle";
 import TurneroCalendario from "@UI/TurneroCalendario";
 import TurnoDetalle from "@UI/TurnoDetalle";
+import TurnosDeUsuario from "@UI/TurnosDeUsuario";
 
 //Mis rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -70,6 +71,9 @@ String.prototype.toTitleCase = function() {
 };
 
 class App extends React.Component {
+
+
+
   constructor(props) {
     super(props);
 
@@ -185,6 +189,7 @@ class App extends React.Component {
           <Route exact path={`${base}/TurneroDetalle/:id`} component={login ? TurneroDetalle : null} />
           <Route exact path={`${base}/TurneroCalendario/:id`} component={login ? TurneroCalendario : null} />
           <Route exact path={`${base}/TurnoDetalle/:id`} component={login ? TurnoDetalle : null} />
+          <Route exact path={`${base}/MisTurnos`} component={login ? TurnosDeUsuario : null} />
           <Route component={Pagina404} />
         </AnimatedSwitch>
       </main>

@@ -33,7 +33,7 @@ const theme = createMuiTheme({
   }
 });
 
-// hot(module)(App);
+hot(module)(App);
 ReactDOM.render(
   <Provider store={Store}>
     <ConnectedRouter history={history}>

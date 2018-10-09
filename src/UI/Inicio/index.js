@@ -25,6 +25,7 @@ import MiContent from "@Componentes/MiContent";
 import CardEntidad from "./CardEntidad";
 import MiCard from "@Componentes/MiCard";
 import TurnoPendiente from "./TurnoPendiente";
+import MiBanerError from "@Componentes/MiBanerError";
 
 //Recursos
 import ToolbarLogo from "@Resources/imagenes/toolbar_logo.png";
@@ -68,9 +69,6 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    // console.log("did mount");
-    // window.addEventListener("resize", this.onResize);
-
     this.setState(
       {
         cargando: true,
@@ -144,6 +142,10 @@ class App extends React.Component {
     this.props.redireccionar("/Entidad/" + entidad.id);
   };
 
+  onBotonMisTurnosClick = () => {
+    this.props.redireccionar("/MisTurnos");
+  };
+
   render() {
     const { classes, width, location, usuario } = this.props;
     if (usuario == undefined) return null;
@@ -166,6 +168,8 @@ class App extends React.Component {
             <div className={classes.separadorToolbar} />
             <div className={classes.content}>
               <MiContent className={classes.content}>
+                <MiBanerError visible={this.state.mostrarError} mensaje={this.state.error} />
+
                 <MiCard titulo="Mis turnos" rootClassName={classNames(classes.cardMisTurnos, this.state.mostrarCardMisTurnos && "visible")}>
                   <div className={classes.contenedorMisTurnos}>
                     {/* <Typography variant="subheading">Turnos pendientes</Typography> */}
@@ -177,7 +181,7 @@ class App extends React.Component {
                     ) : (
                       <div>
                         <Typography variant="title" style={{ marginLeft: "16px", marginBottom: "16px" }}>
-                          Siguientes turnos pendientes:
+                         Próximos turnos:
                         </Typography>
 
                         {this.state.dataTurnosPendientes.map((item, index) => {
@@ -193,8 +197,8 @@ class App extends React.Component {
 
                     {this.state.dataTurno.length != 0 && (
                       <div className={classes.misTurnosContenedorBotones}>
-                        <Button color="primary" variant="raised">
-                          Ver todos mis turnos
+                        <Button color="primary" variant="raised" onClick={this.onBotonMisTurnosClick}>
+                          Ver mis turnos
                         </Button>
                       </div>
                     )}

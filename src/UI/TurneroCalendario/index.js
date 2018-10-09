@@ -101,13 +101,13 @@ class TurneroCalendario extends React.Component {
       if (mes == new Date().getMonth() + 1) {
         let dateHoy = new Date();
         let diaInicio = dateHoy.getDate();
-        if (diaInicio < 9) diaInicio = "0" + diaInicio;
+        if (diaInicio < 10) diaInicio = "0" + diaInicio;
         let mesInicio = dateHoy.getMonth() + 1;
-        if (mesInicio < 9) mesInicio = "0" + mesInicio;
+        if (mesInicio < 10) mesInicio = "0" + mesInicio;
         let añoInicio = dateHoy.getFullYear();
         fechaInicio = diaInicio + "/" + mesInicio + "/" + añoInicio;
       } else {
-        if (mes < 9) mes = "0" + mes;
+        if (mes < 10) mes = "0" + mes;
         fechaInicio = "01/" + mes + "/" + año;
       }
 
@@ -116,9 +116,9 @@ class TurneroCalendario extends React.Component {
       dateFin.setMonth(mes);
 
       let diaFin = dateFin.getDate();
-      if (diaFin < 9) diaFin = "0" + diaFin;
+      if (diaFin < 10) diaFin = "0" + diaFin;
       let mesFin = dateFin.getMonth() + 1;
-      if (mesFin < 9) mesFin = "0" + mesFin;
+      if (mesFin < 10) mesFin = "0" + mesFin;
       let añoFin = dateFin.getFullYear();
       let fechaFin = diaFin + "/" + mesFin + "/" + añoFin;
 
@@ -136,12 +136,10 @@ class TurneroCalendario extends React.Component {
           if (this.state.primeraVez == true) {
             this.setState({ primeraVez: false });
 
-            if (
-              _.filter(data, item => {
-                return item.estadoKeyValue == 1;
-              }) != undefined
-            ) {
-              let diaMinimo = _.min(data, "fecha", "inicio");
+            let diaMinimo = _.min(data, "fecha", "inicio");
+            console.log("Dia minimo");
+            console.log(diaMinimo);
+            if (diaMinimo != undefined) {
               let partesDia = diaMinimo.fecha.split("T")[0].split("-");
               this.onDiaClick(new Date(partesDia[0], parseInt(partesDia[1]) - 1, partesDia[2]));
             }
@@ -223,13 +221,13 @@ class TurneroCalendario extends React.Component {
 
           // let resultado = eventos;
 
-          let agrupados = _.groupBy(eventos, "inicio", "duracion", "estadoKeyValue");
+          let agrupados = _.groupBy(eventos, "inicio", "duracion");
 
           let resultado = [];
           for (var property in agrupados) {
             if (agrupados.hasOwnProperty(property)) {
               let item = agrupados[property];
-              if (item.length != 0 && item[0].estadoKeyValue == 1) {
+              if (item.length != 0) {
                 let fecha = item[0].fecha;
                 let partes = fecha.split("T")[0].split("-");
                 let dia = parseInt(partes[2]);
@@ -432,12 +430,7 @@ class TurneroCalendario extends React.Component {
                       let mes = parseInt(partes[1]) - 1;
                       let año = parseInt(partes[0]);
 
-                      return (
-                        item.estadoKeyValue == 1 &&
-                        props.date.getDate() == dia &&
-                        props.date.getMonth() == mes &&
-                        props.date.getFullYear() == año
-                      );
+                      return props.date.getDate() == dia && props.date.getMonth() == mes && props.date.getFullYear() == año;
                     }) != undefined;
 
                   //Calculo si debe estar deshabilitada
@@ -487,9 +480,9 @@ class TurneroCalendario extends React.Component {
     if (this.state.diaSeleccionado != undefined) {
       let fecha = this.state.diaSeleccionado;
       let dia = fecha.getDate();
-      if (dia < 9) dia = "0" + dia;
+      if (dia < 10) dia = "0" + dia;
       let mes = fecha.getMonth() + 1;
-      if (mes < 9) mes = "0" + mes;
+      if (mes < 10) mes = "0" + mes;
       let año = fecha.getFullYear();
       diaSeleccionado = dia + "/" + mes + "/" + año;
     }
@@ -541,14 +534,14 @@ class TurneroCalendario extends React.Component {
 
     let fecha = this.state.turnoSeleccionado.start;
     let dia = fecha.getDate();
-    if (dia < 9) dia = "0" + dia;
+    if (dia < 10) dia = "0" + dia;
     let mes = fecha.getMonth() + 1;
-    if (mes < 9) mes = "0" + mes;
+    if (mes < 10) mes = "0" + mes;
     let año = fecha.getFullYear();
     let horas = fecha.getHours();
-    if (horas < 9) horas = "0" + horas;
+    if (horas < 10) horas = "0" + horas;
     let minutos = fecha.getMinutes();
-    if (minutos < 9) minutos = "0" + minutos;
+    if (minutos < 10) minutos = "0" + minutos;
     let fechaString = dia + "/" + mes + "/" + año;
     let horaString = horas + ":" + minutos;
     return (
@@ -597,14 +590,14 @@ class TurneroCalendario extends React.Component {
 
     let fecha = this.state.turnoSeleccionado.start;
     let dia = fecha.getDate();
-    if (dia < 9) dia = "0" + dia;
+    if (dia < 10) dia = "0" + dia;
     let mes = fecha.getMonth() + 1;
-    if (mes < 9) mes = "0" + mes;
+    if (mes < 10) mes = "0" + mes;
     let año = fecha.getFullYear();
     let horas = fecha.getHours();
-    if (horas < 9) horas = "0" + horas;
+    if (horas < 10) horas = "0" + horas;
     let minutos = fecha.getMinutes();
-    if (minutos < 9) minutos = "0" + minutos;
+    if (minutos < 10) minutos = "0" + minutos;
     let fechaString = dia + "/" + mes + "/" + año;
     let horaString = horas + ":" + minutos;
     return (

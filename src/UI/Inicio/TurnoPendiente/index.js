@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 //Styles
 import classNames from "classnames";
@@ -50,10 +51,10 @@ class Turno extends React.PureComponent {
               <Typography variant="body2">Fecha:</Typography>
               <Typography variant="body1">{this.convertirFecha(this.props.data.fecha)}</Typography>
             </div>
-            {/* <div className={classes.contenedorTextos}>
+            <div className={classes.contenedorTextos}>
               <Typography variant="body2">Estado:</Typography>
               <Typography variant="body1">{this.props.data.estadoNombre}</Typography>
-            </div> */}
+            </div>
           </div>
         </ButtonBase>
       </React.Fragment>
@@ -65,9 +66,9 @@ class Turno extends React.PureComponent {
     let partesHora = fecha.split("T")[1].split(":");
 
     let dia = partesDia[2];
-    if (dia < 9) dia = "0" + dia;
+    // if (dia < 9) dia = "0" + dia;
     let mes = partesDia[1];
-    if (mes < 9) mes = "0" + mes;
+    // if (mes < 9) mes = "0" + mes;
     let año = partesDia[0];
     return dia + "/" + mes + "/" + año + " " + partesHora[0] + ":" + partesHora[1];
   };
@@ -125,11 +126,21 @@ class Turno extends React.PureComponent {
   };
 }
 
+Turno.propTypes = {
+  data: PropTypes.object.isRequired
+};
+
 let componente = Turno;
+
 componente = withStyles(styles)(componente);
 componente = connect(
   mapStateToProps,
   mapDispatchToProps
 )(componente);
 componente = withRouter(componente);
+
+// componente.propTypes = {
+//   data: PropTypes.func
+// };
+
 export default componente;
