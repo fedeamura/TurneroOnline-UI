@@ -192,7 +192,7 @@ class TurnoDetalle extends React.Component {
                         style={{ color: red["500"], borderColor: red["500"] }}
                         onClick={this.onBotonCancelarTurnoClick}
                       >
-                        Cancelar turno
+                        Anular turno
                       </Button>
                     </div>
                   )}

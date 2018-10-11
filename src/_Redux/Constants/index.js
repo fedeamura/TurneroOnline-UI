@@ -8,3 +8,6 @@ export const ALERTA_HIDE = "ALERTA_HIDE";
 
 //MAIN CONTENT
 export const MAIN_CONTENT_CARGANDO = "MAIN_CONTENT_CARGANDO";
+
+//Notificaciones
+export const NOTIFICACIONES_SET = "NOTIFICACIONES_SET";

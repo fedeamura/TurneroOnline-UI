@@ -7,13 +7,12 @@ const initialState = {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case USUARIO_LOGIN: {
-      localStorage.setItem("usuario", JSON.stringify(action.payload));
-      return { ...state, usuario: action.payload };
+      localStorage.setItem("token", action.payload.token);
+      return { ...state, usuario: action.payload.usuario, token: action.payload.token };
     }
     case USUARIO_CERRAR_SESION: {
       localStorage.removeItem("token");
-      localStorage.removeItem("usuario");
-      return { ...state, usuario: undefined };
+      return { ...state, usuario: undefined, token: undefined };
     }
     default:
       return state;

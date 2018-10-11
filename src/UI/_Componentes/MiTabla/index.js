@@ -145,10 +145,10 @@ class MiTabla extends React.Component {
       order: this.props.order || "desc",
       orderBy: this.props.orderBy,
       orderType: "string",
-      selected: [],
+      selected: this.props.selected || [],
       data: data,
-      page: 0,
-      rowsPerPage: 5
+      page: this.props.page || 0,
+      rowsPerPage: this.props.rowPerPage || 10
     };
   }
 
@@ -158,9 +158,11 @@ class MiTabla extends React.Component {
       return row;
     });
 
-    this.setState({
-      data: data
-    });
+    if (this.state.data != data) {
+      this.setState({
+        data: data
+      });
+    }
   }
 
   handleRequestSort = (event, property, colType) => {
@@ -187,7 +189,9 @@ class MiTabla extends React.Component {
     if (this.props.getFilasSeleccionadas) this.props.getFilasSeleccionadas(this.state.data, newSelected);
   };
 
-  handleClick = (event, id) => {
+  handleClick = (event, id) => {};
+
+  handleCheckboxClick = (event, id) => {
     const { selected } = this.state;
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
@@ -203,8 +207,7 @@ class MiTabla extends React.Component {
     }
 
     this.setState({ selected: newSelected });
-
-    if (this.props.getFilasSeleccionadas) this.props.getFilasSeleccionadas(this.state.data, newSelected);
+    this.props.onFilasSeleccionadasChange && this.props.onFilasSeleccionadasChange(this.state.data, newSelected);
   };
 
   handleChangePage = (event, page) => {
@@ -217,6 +220,16 @@ class MiTabla extends React.Component {
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
 
+  getLabelDisplayedRows = _ref => {
+    var from = _ref.from,
+      to = _ref.to,
+      count = _ref.count;
+    return ""
+      .concat(from, "-")
+      .concat(to, " de ")
+      .concat(count);
+  };
+
   render() {
     const { classes } = this.props;
     const { data, order, orderBy, orderType, selected, rowsPerPage, page } = this.state;
@@ -224,7 +237,7 @@ class MiTabla extends React.Component {
     const check = this.props.check || false;
 
     return (
-      <Paper className={classes.root}>
+      <div className={classNames(classes.root, this.props.className)}>
         <div className={classes.tableWrapper}>
           <Table aria-labelledby="tableTitle">
             <EnhancedTableHead
@@ -251,13 +264,14 @@ class MiTabla extends React.Component {
                       data={n}
                       classes={classes}
                       onClick={this.handleClick}
+                      onCheckboxClick={this.handleCheckboxClick}
                       isSelected={isSelected}
-                      customCell={this.props.customCell}
+                      // customCell={this.props.customCell}
                     />
                   );
                 })}
               {emptyRows > 0 && (
-                <TableRow style={{ height: 49 * emptyRows }}>
+                <TableRow style={{ height: (this.props.rowHeight || 49) * emptyRows }}>
                   <TableCell colSpan={6} padding="default" />
                 </TableRow>
               )}
@@ -267,6 +281,7 @@ class MiTabla extends React.Component {
         <TablePagination
           component="div"
           count={data.length}
+          rowsPerPageOptions={[10, 20, 50]}
           rowsPerPage={rowsPerPage}
           page={page}
           backIconButtonProps={{
@@ -277,26 +292,21 @@ class MiTabla extends React.Component {
           }}
           onChangePage={this.handleChangePage}
           onChangeRowsPerPage={this.handleChangeRowsPerPage}
-          labelRowsPerPage={(this.props.rowType ? this.props.rowType : "Concepto") + " por página"}
-          labelDisplayedRows={function labelDisplayedRows(_ref) {
-            var from = _ref.from,
-              to = _ref.to,
-              count = _ref.count;
-            return ""
-              .concat(from, "-")
-              .concat(to, " de ")
-              .concat(count);
-          }}
+          labelRowsPerPage={(this.props.rowType ? this.props.rowType : "") + " por página"}
+          labelDisplayedRows={this.getLabelDisplayedRows}
         />
-      </Paper>
+      </div>
     );
   }
 }
 
 class MiRow extends React.PureComponent {
   onClick = event => {
-    if (this.props.onClick == undefined) return;
-    this.props.onClick(event, this.props.data.id);
+    this.props.onClick && this.props.onClick(event, this.props.data.id);
+  };
+
+  onCheckboxClick = event => {
+    this.props.onCheckboxClick && this.props.onCheckboxClick(event, this.props.data.id);
   };
 
   render() {
@@ -315,7 +325,7 @@ class MiRow extends React.PureComponent {
       >
         {check == true && (
           <TableCell padding="checkbox">
-            <Checkbox checked={this.props.isSelected || false} />
+            <Checkbox checked={this.props.isSelected || false} onClick={this.onCheckboxClick} />
           </TableCell>
         )}
         {Object.keys(this.props.data).map((cell, key) => {
@@ -328,19 +338,19 @@ class MiRow extends React.PureComponent {
             )
           );
         })}
-        {this.renderCustomCell()}
+        {/* {this.renderCustomCell()} */}
       </TableRow>
     );
   }
 
-  renderCustomCell = () => {
-    return <TableCell padding="none">{this.renderCustomCellContent()}</TableCell>;
-  };
+  // renderCustomCell = () => {
+  //   return <TableCell padding="none">{this.renderCustomCellContent()}</TableCell>;
+  // };
 
-  renderCustomCellContent = () => {
-    if (this.props.customCell == undefined) return null;
-    return this.props.customCell(this.props.data);
-  };
+  // renderCustomCellContent = () => {
+  //   if (this.props.customCell == undefined) return null;
+  //   return this.props.customCell(this.props.data);
+  // };
 }
 
 MiTabla.propTypes = {

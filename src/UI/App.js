@@ -13,7 +13,8 @@ import { AnimatedSwitch } from "react-router-transition";
 //REDUX
 import { connect } from "react-redux";
 import { ocultarAlerta } from "@Redux/Actions/alerta";
-import { login } from "@Redux/Actions/usuario";
+import { login, cerrarSesion } from "@Redux/Actions/usuario";
+import { push } from "connected-react-router";
 
 //Componentes
 import Snackbar from "@material-ui/core/Snackbar";
@@ -33,7 +34,6 @@ import TurnosDeUsuario from "@UI/TurnosDeUsuario";
 
 //Mis rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
-import { push } from "connected-react-router";
 
 const mapStateToProps = state => {
   return {
@@ -46,8 +46,11 @@ const mapDispatchToProps = dispatch => ({
   onAlertaClose: id => {
     dispatch(ocultarAlerta(id));
   },
-  login: usuario => {
-    dispatch(login(usuario));
+  login: comando => {
+    dispatch(login(comando));
+  },
+  cerrarSesion: () => {
+    dispatch(cerrarSesion());
   },
   redireccionar: url => {
     dispatch(push(url));
@@ -71,9 +74,6 @@ String.prototype.toTitleCase = function() {
 };
 
 class App extends React.Component {
-
-
-
   constructor(props) {
     super(props);
 
@@ -85,10 +85,9 @@ class App extends React.Component {
   componentDidMount() {
     if (this.props.location.pathname == "/Token") return;
 
-    // debugger;
     let token = localStorage.getItem("token");
     if (token == undefined || token == null || token == "undefined") {
-      localStorage.removeItem("token");
+      this.props.cerrarSesion();
       window.location.href = window.Config.URL_LOGIN;
       return;
     }
@@ -97,37 +96,40 @@ class App extends React.Component {
       Rules_Usuario.validarToken(token)
         .then(resultado => {
           if (resultado == false) {
-            localStorage.removeItem("token");
+            this.props.cerrarSesion();
             window.location.href = window.Config.URL_LOGIN;
             return;
           }
 
           Rules_Usuario.datos(token)
             .then(datos => {
-              this.props.login(datos);
-              // this.props.redireccionar(
-              //   this.props.location.pathname + this.props.location.search
-              // );
+              this.props.login({
+                usuario: datos,
+                token: token
+              });
+              this.onLogin();
             })
             .catch(error => {
-              localStorage.removeItem("token");
+              this.props.cerrarSesion();
               window.location.href = window.Config.URL_LOGIN;
             });
         })
         .catch(error => {
-          localStorage.removeItem("token");
+          this.props.cerrarSesion();
           window.location.href = window.Config.URL_LOGIN;
         })
         .finally(() => {
           this.setState({ validandoToken: false });
         });
     });
+  }
 
+  onLogin = () => {
     //Cada 5 seg valido el token
     this.intervalo = setInterval(() => {
       let token = localStorage.getItem("token");
       if (token == undefined || token == null || token == "undefined") {
-        localStorage.removeItem("token");
+        this.props.cerrarSesion();
         window.location.href = window.Config.URL_LOGIN;
         return;
       }
@@ -135,17 +137,17 @@ class App extends React.Component {
       Rules_Usuario.validarToken(token)
         .then(resultado => {
           if (resultado == false) {
-            localStorage.removeItem("token");
+            this.props.cerrarSesion();
             window.location.href = window.Config.URL_LOGIN;
             return;
           }
         })
         .catch(error => {
-          localStorage.removeItem("token");
+          this.props.cerrarSesion();
           window.location.href = window.Config.URL_LOGIN;
         });
     }, 5000);
-  }
+  };
 
   componentWillUnmount() {
     this.intervalo && clearInterval(this.intervalo);

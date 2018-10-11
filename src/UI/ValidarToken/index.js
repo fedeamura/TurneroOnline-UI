@@ -50,25 +50,25 @@ class ValidarToken extends React.Component {
 
     let search = location.search;
     if (!search.startsWith("?")) {
-      localStorage.removeItem("token");
+      this.props.cerrarSesion();
       window.location.href = window.Config.URL_LOGIN;
       return;
     }
 
-    let token = search.substring(1).split("=")[1];
+    search = search.substring(1);
+    search = new URLSearchParams(search);
+    let token = search.get("token");
     if (token == undefined) {
-      localStorage.removeItem("token");
+      this.props.cerrarSesion();
       window.location.href = window.Config.URL_LOGIN;
       return;
     }
-
-    localStorage.setItem("token", token);
 
     Rules_Usuario.validarToken(token)
       .then(resultado => {
         if (resultado == false) {
           debugger;
-          localStorage.removeItem("token");
+
           this.props.cerrarSesion();
           window.location.href = window.Config.URL_LOGIN;
           return;
@@ -76,13 +76,14 @@ class ValidarToken extends React.Component {
 
         Rules_Usuario.datos(token)
           .then(datos => {
-            this.props.login(datos);
-            this.props.redireccionar("/");
+            this.props.login({ usuario: datos, token: token });
+
+            let url = search.get("url") || "/";
+            this.props.redireccionar(url);
           })
           .catch(error => {
             debugger;
 
-            localStorage.removeItem("token");
             this.props.cerrarSesion();
             window.location.href = window.Config.URL_LOGIN;
           });
@@ -90,7 +91,6 @@ class ValidarToken extends React.Component {
       .catch(error => {
         debugger;
 
-        localStorage.removeItem("token");
         this.props.cerrarSesion();
         window.location.href = window.Config.URL_LOGIN;
       });

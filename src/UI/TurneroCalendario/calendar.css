@@ -73,7 +73,8 @@
 }
 
 .customDate.seleccionado {
-  background-color: #149257;
+  background-color: #f68a1e;
+  border: none;
 }
 
 .customDate.seleccionado label {

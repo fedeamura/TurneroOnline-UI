@@ -465,9 +465,14 @@ class TurneroCalendario extends React.Component {
           />
         </div>
 
-        <div className={classNames("contenedorInfo")}>
-          <Icon>info_outline</Icon>
-          <Typography variant="body1">Los dias con resaltados en verde poseen turnos disponibles para reservar</Typography>
+        <div className={classNames(classes.contenedorInfo)}>
+          <div className={classNames(classes.indicadorInfo, classes.indicadorInfoDiaSeleccionado)} />
+          <Typography variant="body1">Día seleccionado</Typography>
+        </div>
+
+        <div className={classNames(classes.contenedorInfo)}>
+          <div className={classNames(classes.indicadorInfo, classes.indicadorInfoTurnoDisponible)} />
+          <Typography variant="body1">Días con turnos disponibles</Typography>
         </div>
       </div>
     );
