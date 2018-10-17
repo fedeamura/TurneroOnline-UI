@@ -9,7 +9,7 @@ import styles from "./styles";
 import { connect } from "react-redux";
 import { cerrarSesion } from "@Redux/Actions/usuario";
 import Icon from "@material-ui/core/Icon";
-import { push } from "connected-react-router";
+import { push, replace } from "connected-react-router";
 
 //Componentes
 import AppBar from "@material-ui/core/AppBar";
@@ -46,6 +46,9 @@ const mapDispatchToProps = dispatch => {
     },
     redirigir: url => {
       dispatch(push(url));
+    },
+    replace: url => {
+      dispatch(replace(url));
     }
   };
 };
@@ -85,8 +88,8 @@ class MiToolbar extends React.Component {
     if (this.props.cargando) return;
     this.setState({ anchorPopupUsuario: null });
     this.props.cerrarSesion();
-    localStorage.removeItem("token");
-    window.location.href = window.Config.URL_LOGIN;
+    this.props.replace("/Login");
+    // window.location.href = window.Config.URL_LOGIN;
   };
 
   handleDrawerClose = () => {
@@ -115,7 +118,7 @@ class MiToolbar extends React.Component {
   };
 
   onTituloClick = () => {
-    console.log("click");
+    // console.log("click");
     this.props.redirigir("/");
   };
   render() {

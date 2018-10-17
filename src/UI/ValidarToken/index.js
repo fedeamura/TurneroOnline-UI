@@ -14,7 +14,7 @@ import { withRouter } from "react-router-dom";
 
 //REDUX
 import { connect } from "react-redux";
-import { push } from "connected-react-router";
+import { push, replace } from "connected-react-router";
 import { login, cerrarSesion } from "@Redux/Actions/usuario";
 
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -35,6 +35,9 @@ const mapDispatchToProps = dispatch => ({
   },
   redireccionar: url => {
     dispatch(push(url));
+  },
+  replace: url => {
+    dispatch(replace(url));
   }
 });
 
@@ -51,7 +54,8 @@ class ValidarToken extends React.Component {
     let search = location.search;
     if (!search.startsWith("?")) {
       this.props.cerrarSesion();
-      window.location.href = window.Config.URL_LOGIN;
+      this.props.replace("/Login");
+      // window.location.href = window.Config.URL_LOGIN;
       return;
     }
 
@@ -60,7 +64,8 @@ class ValidarToken extends React.Component {
     let token = search.get("token");
     if (token == undefined) {
       this.props.cerrarSesion();
-      window.location.href = window.Config.URL_LOGIN;
+      this.props.replace("/Login");
+      // window.location.href = window.Config.URL_LOGIN;
       return;
     }
 
@@ -70,7 +75,8 @@ class ValidarToken extends React.Component {
           debugger;
 
           this.props.cerrarSesion();
-          window.location.href = window.Config.URL_LOGIN;
+          this.props.replace("/Login");
+          // window.location.href = window.Config.URL_LOGIN;
           return;
         }
 
@@ -85,21 +91,23 @@ class ValidarToken extends React.Component {
             debugger;
 
             this.props.cerrarSesion();
-            window.location.href = window.Config.URL_LOGIN;
+            this.props.replace("/Login");
+            // window.location.href = window.Config.URL_LOGIN;
           });
       })
       .catch(error => {
         debugger;
 
         this.props.cerrarSesion();
-        window.location.href = window.Config.URL_LOGIN;
+        this.props.replace("/Login");
+        // window.location.href = window.Config.URL_LOGIN;
       });
   }
 
   render() {
     const { classes, width, location } = this.props;
 
-    console.log(location);
+    // console.log(location);
 
     return (
       <React.Fragment>

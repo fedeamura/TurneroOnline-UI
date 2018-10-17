@@ -32,7 +32,7 @@ import ToolbarLogo from "@Resources/imagenes/toolbar_logo.png";
 
 //Rules
 import Rules_Entidad from "@Rules/Rules_Entidad";
-import Rules_Turno from "@Rules/Rules_Turno";
+import Rules_ReservaTurno  from "@Rules/Rules_ReservaTurno";
 
 const mapStateToProps = state => {
   return {
@@ -79,10 +79,10 @@ class App extends React.Component {
       () => {
         Rules_Entidad.get()
           .then(dataEntidad => {
-            Rules_Turno.getDeUsuarioLogeado()
+            Rules_ReservaTurno.getDeUsuarioLogeado()
               .then(dataTurno => {
                 let turnosPendientes = _.filter(_.orderBy(dataTurno, "fecha"), item => {
-                  return item.estadoKeyValue == 2;
+                  return item.estadoKeyValue == 1;
                 });
                 this.setState(
                   {
@@ -135,7 +135,7 @@ class App extends React.Component {
   // };
 
   onTurnoPendienteClick = turno => {
-    this.props.redireccionar("/TurnoDetalle/" + turno.id);
+    this.props.redireccionar("/Reserva/" + turno.id);
   };
 
   onBotonEntidadClick = entidad => {
@@ -143,7 +143,7 @@ class App extends React.Component {
   };
 
   onBotonMisTurnosClick = () => {
-    this.props.redireccionar("/MisTurnos");
+    this.props.redireccionar("/MisReservas");
   };
 
   render() {

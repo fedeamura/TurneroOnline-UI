@@ -1,7 +1,8 @@
 const styles = theme => {
   return {
     paginaContent: {
-      display: "flex"
+      display: "flex",
+      overflow: "auto"
     },
     content: {
       overflow: "auto",
@@ -90,6 +91,41 @@ const styles = theme => {
         opacity: 1,
         pointerEvents: "auto"
       }
+    },
+    cardCalendario: {
+      height: "400px",
+      "& > div": {
+        height: "100%"
+      }
+    },
+    colEstado: {
+      display: "flex",
+      "& > div": {
+        marginRight: "8px"
+      }
+    },
+    indicadorEstado: {
+      width: 20,
+      height: 20,
+      backgroundColor: "black",
+      borderRadius: 20
+    },
+    contenedorIndicadorDiaCalendario: {
+      display: "flex",
+      position: "absolute",
+      bottom: "0px"
+    },
+    indicadorDiaCalendario: {
+      width: 4,
+      height: 4,
+      backgroundColor: "black",
+      borderRadius: 4,
+      "&:not(:last-child)": {
+        marginRight: "2px"
+      }
+    },
+    contenedorFiltroEstado: {
+      display: "flex"
     }
   };
 };

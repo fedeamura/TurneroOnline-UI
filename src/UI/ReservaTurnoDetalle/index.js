@@ -35,8 +35,8 @@ import PanelTurneroDetalle from "../TurneroDetalle/PanelTurneroDetalle";
 import ToolbarLogo from "@Resources/imagenes/toolbar_logo.png";
 
 //Rules
-import Rules_Turno from "@Rules/Rules_Turno";
 import Rules_Turnero from "@Rules/Rules_Turnero";
+import Rules_ReservaTurno  from "@Rules/Rules_ReservaTurno";
 
 const mapStateToProps = state => {
   return {};
@@ -51,7 +51,7 @@ const mapDispatchToProps = dispatch => ({
   }
 });
 
-class TurnoDetalle extends React.Component {
+class ReservaDetalle extends React.Component {
   constructor(props) {
     super(props);
 
@@ -79,7 +79,7 @@ class TurnoDetalle extends React.Component {
         cardVisible: false
       },
       () => {
-        Rules_Turno.getDetalle(this.state.id)
+        Rules_ReservaTurno.getDetalle(this.state.id)
           .then(dataTurno => {
             if (dataTurno == undefined) {
               this.setState({
@@ -136,9 +136,9 @@ class TurnoDetalle extends React.Component {
     this.setState({ dialogoConfirmarCancelarVisible: false });
   };
 
-  cancelar = () => {
+  anularReserva = () => {
     this.setState({ cargando: true, mostrarError: false, dialogoConfirmarCancelarVisible: false }, () => {
-      Rules_Turno.cancelarPorUsuario(this.state.id)
+      Rules_ReservaTurno.anular(this.state.id)
         .then(() => {
           this.buscarDatos();
         })
@@ -185,7 +185,7 @@ class TurnoDetalle extends React.Component {
                 <div style={{ padding: "16px" }}>
                   <TurnoPendiente data={this.state.dataTurno} />
 
-                  {this.state.dataTurno.estadoKeyValue == 2 && (
+                  {this.state.dataTurno.estadoKeyValue == 1 && (
                     <div className={classes.contenedorBotones}>
                       <Button
                         variant="outlined"
@@ -223,7 +223,7 @@ class TurnoDetalle extends React.Component {
         </DialogContent>
         <DialogActions>
           <Button onClick={this.onDialogoConfirmarCancelarTurnoClose}>Cancelar</Button>
-          <Button onClick={this.cancelar} color="primary" autoFocus>
+          <Button onClick={this.anularReserva} color="primary" autoFocus>
             Si, cancelar el turno
           </Button>
         </DialogActions>
@@ -238,7 +238,7 @@ class TurnoDetalle extends React.Component {
   };
 }
 
-let componente = TurnoDetalle;
+let componente = ReservaDetalle;
 componente = connect(
   mapStateToProps,
   mapDispatchToProps
