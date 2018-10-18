@@ -8,7 +8,7 @@ const metodos = {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Token: localStorage.getItem("token")
+          "--Token": localStorage.getItem("token")
         }
       })
         .then(data => data.json())

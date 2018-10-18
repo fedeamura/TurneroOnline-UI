@@ -9,7 +9,7 @@ const metodos = {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          "Token": token
+          "--Token": token
         }
       })
         .then(data => data.json())
@@ -34,7 +34,7 @@ const metodos = {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          "Token": token
+          "--Token": token
         }
       })
         .then(data => data.json())

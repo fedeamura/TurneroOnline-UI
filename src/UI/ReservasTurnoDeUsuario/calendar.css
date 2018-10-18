@@ -255,25 +255,3 @@
   padding: 16px;
   background-color: #ffb74d;
 }
-
-@media screen and (max-width: 960px) {
-  .contenedor {
-    overflow: auto;
-  }
-  .colColendarioDia {
-    max-height: inherit;
-    padding-top: 0 !important;
-  }
-
-  .rbc-time-content {
-    overflow: hidden;
-  }
-}
-
-.dialogo_info {
-  display: flex;
-  align-items: baseline;
-}
-.dialogo_info > aside {
-  margin-right: 8px;
-}

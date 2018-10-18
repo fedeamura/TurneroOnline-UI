@@ -9,7 +9,7 @@ const metodos = {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Token: localStorage.getItem("token")
+          "--Token": localStorage.getItem("token")
         }
       })
         .then(data => data.json())
@@ -27,14 +27,14 @@ const metodos = {
     });
   },
   getTurnos: comando => {
-    const url = window.Config.WS_TURNERO + "/v1/TurneroPorTramite/Turnos";
+    const url = window.Config.WS_TURNERO + "/v1/TurneroPorTramite/TurnosDisponibles";
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "PUT",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Token: localStorage.getItem("token")
+          "--Token": localStorage.getItem("token")
         },
         body: JSON.stringify(comando)
       })

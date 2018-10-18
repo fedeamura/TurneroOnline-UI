@@ -23,10 +23,7 @@ class Login extends React.PureComponent {
   componentDidMount() {
     window.addEventListener("message", e => {
       if (e === undefined || e.data === undefined) return;
-
       let data = e.data;
-
-      console.log(data);
       var token = data.Token;
       this.props.replace("/Token?token=" + token);
     });
@@ -35,10 +32,7 @@ class Login extends React.PureComponent {
   render() {
     return (
       <React.Fragment>
-        <iframe
-          style={{ width: "100%", height: "100%" }}
-          src="https://servicios2.cordoba.gov.ar/VecinoVirtualUtils_Internet/Acceder?subtitulo=Turnero&url=http%3A%2F%2Flocalhost%3A3000%2F%23%2F"
-        />
+        <iframe style={{ width: "100%", height: "100%", border: "none" }} src={window.Config.URL_LOGIN} />
       </React.Fragment>
     );
   }

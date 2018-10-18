@@ -2,7 +2,9 @@ const styles = theme => {
   return {
     paginaContent: {
       display: "flex",
-      overflow: "auto"
+      overflow: "hidden",
+      overflowY: "auto",
+      padding: "16px"
     },
     content: {
       overflow: "auto",

@@ -113,6 +113,16 @@ class TurnosDeUsuario extends React.Component {
     this.setState({ filtroEstados: filtroEstados });
   };
 
+  onDiaClick = dia => {
+    if (this.state.diaSeleccionado && this.state.diaSeleccionado.getDate() == dia.getDate()) {
+      this.setState({ diaSeleccionado: undefined });
+    } else {
+      let filtroEstados = this.state.filtroEstados;
+      filtroEstados["1"] = true;
+      this.setState({ diaSeleccionado: dia, filtroEstados: filtroEstados });
+    }
+  };
+
   render() {
     const { classes } = this.props;
 
@@ -136,7 +146,7 @@ class TurnosDeUsuario extends React.Component {
             )}
 
             <Grid item xs={12}>
-              <Grid container spacing={16} style={{ padding: 16 }}>
+              <Grid container spacing={16}>
                 <Grid item xs={12} md={4} lg={3}>
                   {this.renderCalendario()}
                 </Grid>
@@ -153,16 +163,6 @@ class TurnosDeUsuario extends React.Component {
       </React.Fragment>
     );
   }
-
-  onDiaClick = dia => {
-    if (this.state.diaSeleccionado && this.state.diaSeleccionado.getDate() == dia.getDate()) {
-      this.setState({ diaSeleccionado: undefined });
-    } else {
-      let filtroEstados = this.state.filtroEstados;
-      filtroEstados["1"] = true;
-      this.setState({ diaSeleccionado: dia, filtroEstados: filtroEstados });
-    }
-  };
 
   renderCalendario = () => {
     const { classes } = this.props;

@@ -3,14 +3,15 @@ import utils from "@Componentes/utils";
 
 const metodos = {
   anular: id => {
-    const url = window.Config.WS_TURNERO + "/v1/ReservaTurno/anular/" + id;
+    const url = window.Config.WS_TURNERO + "/v1/ReservaTurno/anular/";
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "PUT",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Token: localStorage.getItem("token")
+          "--Token": localStorage.getItem("token"),
+          "--Id": id
         }
       })
         .then(data => data.json())
@@ -35,7 +36,7 @@ const metodos = {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Token: localStorage.getItem("token")
+          "--Token": localStorage.getItem("token")
         }
       })
         .then(data => data.json())
@@ -62,14 +63,15 @@ const metodos = {
     });
   },
   getDetalle: id => {
-    const url = window.Config.WS_TURNERO + "/v1/ReservaTurno/Detalle/" + id;
+    const url = window.Config.WS_TURNERO + "/v1/ReservaTurno/Detalle";
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "GET",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          Token: localStorage.getItem("token")
+          "--Token": localStorage.getItem("token"),
+          "--Id": id
         }
       })
         .then(data => data.json())
