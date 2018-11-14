@@ -19,7 +19,10 @@ const styles = theme => ({
     display: "flex",
     width: "100%",
     padding: theme.spacing.unit * 2,
-    flexDirection: "column"
+    flexDirection: "column",
+    [theme.breakpoints.up("md")]: {
+      padding: theme.spacing.unit * 4
+    }
   },
   content: {
     alignSelf: "center",

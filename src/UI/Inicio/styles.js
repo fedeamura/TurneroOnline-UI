@@ -26,9 +26,9 @@ const styles = theme => {
       }
     },
     contentClassNames: {
-      padding: theme.spacing.unit * 2,
       display: "flex",
-      flexDirection: "column"
+      flexDirection: "column",
+    
     },
     switchWrapper: {
       backgroundColor: theme.palette.background.default,

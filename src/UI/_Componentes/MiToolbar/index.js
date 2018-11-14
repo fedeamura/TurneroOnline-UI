@@ -128,7 +128,7 @@ class MiToolbar extends React.Component {
           )}
 
           {/* Left icon */}
-          {this.props.renderLeftIcon === undefined && this.props.leftIcon === undefined && <div style={{ width: 16 }} />}
+          {/* {this.props.renderLeftIcon === undefined && this.props.leftIcon === undefined && <div style={{ width: 16 }} />} */}
 
           {/* Logo muni */}
           {this.props.renderLogo}

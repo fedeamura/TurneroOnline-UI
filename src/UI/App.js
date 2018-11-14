@@ -24,10 +24,8 @@ import { IconButton, Icon, Typography } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 
 //Mis componentes
-import Login from "@UI/Login";
 import Pagina404 from "@UI/_Pagina404";
 import Inicio from "@UI/Inicio";
-import ValidarToken from "@UI/ValidarToken";
 import EntidadDetalle from "@UI/EntidadDetalle";
 import TurneroDetalle from "@UI/TurneroDetalle";
 import TurneroCalendario from "@UI/TurneroCalendario";
@@ -111,8 +109,6 @@ class App extends React.Component {
     }
   }
   componentDidMount() {
-    if (this.props.location.pathname == "/Token" || this.props.location.pathname == "/Login") return;
-
     let token = localStorage.getItem("token");
 
     let search = this.props.location.search;
@@ -213,7 +209,7 @@ class App extends React.Component {
   }
 
   renderContent() {
-    const { classes, match } = this.props;
+    const { classes } = this.props;
 
     let base = "";
 
@@ -222,9 +218,6 @@ class App extends React.Component {
     return (
       <main className={classes.content}>
         <AnimatedSwitch atEnter={{ opacity: 0 }} atLeave={{ opacity: 0 }} atActive={{ opacity: 1 }} className={"switch-wrapper"}>
-          <Route path={`${base}/Login`} component={Login} />
-          <Route path={`${base}/Token`} component={ValidarToken} />
-
           {/* Todas las paginas de aca abajo necesitan usuario logeado */}
           <Route exact path={`${base}/`} component={login ? Inicio : null} />
           <Route exact path={`${base}/Entidad/:id`} component={login ? EntidadDetalle : null} />
