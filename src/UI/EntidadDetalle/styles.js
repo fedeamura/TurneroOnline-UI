@@ -1,7 +1,6 @@
 const styles = theme => {
   return {
     contentClassNames: {
-      padding: theme.spacing.unit * 2,
       display: "flex",
       flexDirection: "column"
     },

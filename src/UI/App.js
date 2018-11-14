@@ -143,11 +143,12 @@ class App extends React.Component {
                 token: token
               });
 
-              let url = "/";
+              // let url = "/";
               if (search) {
-                url = search.get("url") || "/";
+                let url = search.get("url") || "/";
+                this.props.redireccionar(url);
+
               }
-              this.props.redireccionar(url);
               this.onLogin();
             })
             .catch(() => {
