@@ -1,4 +1,4 @@
-// import "./public-path";
+import "./public-path";
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "@UI/App";
@@ -16,35 +16,18 @@ import Store, { history } from "@Redux/Store/index";
 //Router
 import { ConnectedRouter } from "connected-react-router";
 
-//Theme
-import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: "#149257"
-    },
-    secondary: {
-      main: "#149257"
-    },
-    background: {
-      default: "#eee"
-    }
-  }
-});
-
-hot(module)(App);
-ReactDOM.render(
+let MiApp = ()=>(
   <Provider store={Store}>
     <ConnectedRouter history={history}>
       <MuiPickersUtilsProvider utils={DateFnsUtils} locale={arLocale}>
-        <MuiThemeProvider theme={theme}>
           <App />
-        </MuiThemeProvider>
       </MuiPickersUtilsProvider>
     </ConnectedRouter>
-  </Provider>,
-  document.getElementById("root")
+  </Provider>
 );
+
+hot(module)(MiApp);
+ReactDOM.render(<MiApp/>,document.getElementById("root"));
 
 registerServiceWorker();

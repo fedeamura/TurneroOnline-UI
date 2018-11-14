@@ -26,17 +26,18 @@ import red from "@material-ui/core/colors/red";
 import MiContent from "@Componentes/MiContent";
 import MiPagina from "@Componentes/MiPagina";
 import MiCard from "@Componentes/MiCard";
-import MiBanerError from "@Componentes/MiBanerError";
+import MiBaner from "@Componentes/MiBaner";
 
 import TurnoPendiente from "../Inicio/TurnoPendiente";
 import PanelTurneroDetalle from "../TurneroDetalle/PanelTurneroDetalle";
 
 //Recursos
-import ToolbarLogo from "@Resources/imagenes/toolbar_logo.png";
+import ToolbarLogo from "@Resources/imagenes/escudo_muni_texto_verde.png";
+import ToolbarLogo_Chico from "@Resources/imagenes/escudo_muni_verde.png";
 
 //Rules
 import Rules_Turnero from "@Rules/Rules_Turnero";
-import Rules_ReservaTurno  from "@Rules/Rules_ReservaTurno";
+import Rules_ReservaTurno from "@Rules/Rules_ReservaTurno";
 
 const mapStateToProps = state => {
   return {};
@@ -180,7 +181,7 @@ class ReservaDetalle extends React.Component {
         >
           <MiContent className={classes.content}>
             <MiCard padding={false} titulo="Datos del turno" rootClassName={classNames(classes.card, this.state.cardVisible && "visible")}>
-              <MiBanerError visible={this.state.mostrarError} mensaje={this.state.error} onClose={this.onBotonOcultarErrorClick} />
+              <MiBaner modo="error" visible={this.state.mostrarError} mensaje={this.state.error} onClose={this.onBotonOcultarErrorClick} />
               {this.state.dataTurno && (
                 <div style={{ padding: "16px" }}>
                   <TurnoPendiente data={this.state.dataTurno} />

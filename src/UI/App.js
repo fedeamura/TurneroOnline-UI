@@ -4,6 +4,7 @@ import React from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { withStyles } from "@material-ui/core/styles";
 import "./style.css";
+import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 
 //Router
 import { withRouter } from "react-router-dom";
@@ -36,8 +37,23 @@ import ReservasTurnosDeUsuario from "@UI/ReservasTurnoDeUsuario";
 //Mis rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
 
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: "#149257"
+    },
+    secondary: {
+      main: "#149257"
+    },
+    background: {
+      default: "#eee"
+    }
+  }
+});
+
 const mapStateToProps = state => {
   return {
+    token: state.Usuario.token,
     usuario: state.Usuario.usuario,
     alertas: state.Alerta.alertas
   };
@@ -86,14 +102,32 @@ class App extends React.Component {
     };
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.token != nextProps.token) {
+      if (nextProps.token === undefined) {
+        this.props.cerrarSesion();
+        window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+      }
+    }
+  }
   componentDidMount() {
     if (this.props.location.pathname == "/Token" || this.props.location.pathname == "/Login") return;
 
     let token = localStorage.getItem("token");
-    if (token == undefined || token == null || token == "undefined") {
+
+    let search = this.props.location.search;
+    if (search.startsWith("?")) {
+      search = search.substring(1);
+      search = new URLSearchParams(search);
+      let tokenQueryString = search.get("token");
+      if (tokenQueryString) {
+        token = tokenQueryString;
+      }
+    }
+
+    if (token == undefined || token == null || token == "undefined" || token == "") {
       this.props.cerrarSesion();
-      this.props.replace('/Login');
-      // window.location.href = window.Config.URL_LOGIN;
+      window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
       return;
     }
 
@@ -102,8 +136,7 @@ class App extends React.Component {
         .then(resultado => {
           if (resultado == false) {
             this.props.cerrarSesion();
-            this.props.replace('/Login');
-            // window.location.href = window.Config.URL_LOGIN;
+            window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
             return;
           }
 
@@ -113,18 +146,22 @@ class App extends React.Component {
                 usuario: datos,
                 token: token
               });
+
+              let url = "/";
+              if (search) {
+                url = search.get("url") || "/";
+              }
+              this.props.redireccionar(url);
               this.onLogin();
             })
-            .catch(error => {
+            .catch(() => {
               this.props.cerrarSesion();
-              this.props.replace('/Login');
-              // window.location.href = window.Config.URL_LOGIN;
+              window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
             });
         })
         .catch(error => {
           this.props.cerrarSesion();
-          this.props.replace('/Login');
-          // window.location.href = window.Config.URL_LOGIN;
+          window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
         })
         .finally(() => {
           this.setState({ validandoToken: false });
@@ -138,8 +175,7 @@ class App extends React.Component {
       let token = localStorage.getItem("token");
       if (token == undefined || token == null || token == "undefined") {
         this.props.cerrarSesion();
-        this.props.replace('/Login');
-        // window.location.href = window.Config.URL_LOGIN;
+        window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
         return;
       }
 
@@ -147,15 +183,13 @@ class App extends React.Component {
         .then(resultado => {
           if (resultado == false) {
             this.props.cerrarSesion();
-            this.props.replace("/Login");
-            // window.location.href = window.Config.URL_LOGIN;
+            window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
             return;
           }
         })
         .catch(error => {
           this.props.cerrarSesion();
-          this.props.replace("/Login");
-          // window.location.href = window.Config.URL_LOGIN;
+          window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
         });
     }, 5000);
   };
@@ -167,20 +201,14 @@ class App extends React.Component {
   render() {
     const { classes } = this.props;
 
-    // const procesandoLogin = this.state.validandoToken == true;
-
     return (
-      <div className={classes.root}>
-        <CssBaseline />
-        {this.renderContent()}
-        {this.renderAlertas()}
-
-        {/* {procesandoLogin && (
-          <div style={{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0, zIndex: 2000, background: "red" }}>
-            <Typography>Procesando login</Typography>
-          </div>
-        )} */}
-      </div>
+      <MuiThemeProvider theme={theme}>
+        <div className={classes.root}>
+          <CssBaseline />
+          {this.renderContent()}
+          {this.renderAlertas()}
+        </div>
+      </MuiThemeProvider>
     );
   }
 

@@ -1,30 +1,35 @@
 const styles = theme => {
   return {
-    paginaContent: {
-      display: "flex"
-    },
-    content: {
-      overflow: "auto",
-      flex: 1
+    contentClassNames: {
+      padding: theme.spacing.unit * 2,
+      display: "flex",
+      flexDirection: "column"
     },
     toolbar: {
       backgroundColor: "white",
       "& h2": {
         color: "black"
       },
-      "& .material-icons": {
+      "& h3": {
         color: "black"
-      }
+      },
+      color: "black"
     },
     logoMuni: {
-      marginRight: "16px",
+      marginRight: "8px",
       backgroundPosition: "center",
-      minWidth: "126px",
-      maxWidth: "126px",
-      minHeight: "56px",
-      maxHeight: "56px",
+      minWidth: "40px",
+      maxWidth: "40px",
+      minHeight: "40px",
+      maxHeight: "40px",
       backgroundRepeat: "no-repeat",
-      backgroundSize: "contain"
+      backgroundSize: "contain",
+      [theme.breakpoints.up("md")]: {
+        marginRight: "16px",
+        flexDirection: "row",
+        minWidth: "126px",
+        maxWidth: "126px"
+      }
     },
     card: {
       opacity: 0,

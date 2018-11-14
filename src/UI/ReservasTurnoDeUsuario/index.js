@@ -24,12 +24,13 @@ import { IconButton, Icon, Grid, Button } from "@material-ui/core";
 import MiContent from "@Componentes/MiContent";
 import MiPagina from "@Componentes/MiPagina";
 import MiCard from "@Componentes/MiCard";
-import MiBanerError from "@Componentes/MiBanerError";
+import MiBaner from "@Componentes/MiBaner";
 import MiTabla from "@Componentes/MiTabla";
-import utils from "@Componentes/utils";
+import DateUtils from "@Componentes/Utils/Date";
 
 //Recursos
-import ToolbarLogo from "@Resources/imagenes/toolbar_logo.png";
+import ToolbarLogo from "@Resources/imagenes/escudo_muni_texto_verde.png";
+import ToolbarLogo_Chico from "@Resources/imagenes/escudo_muni_verde.png";
 
 //Rules
 import Rules_ReservaTurno from "@Rules/Rules_ReservaTurno";
@@ -141,7 +142,7 @@ class TurnosDeUsuario extends React.Component {
             {this.state.mostrarError && (
               <Grid item xs={12}>
                 {/* <MiContent className={classes.content} contentClassName={classes.miContentContent}> */}
-                <MiBanerError mensaje={this.state.error} visible={this.state.mostrarError} />
+                <MiBaner modo="error" mensaje={this.state.error} visible={this.state.mostrarError} />
               </Grid>
             )}
 
@@ -193,11 +194,11 @@ class TurnosDeUsuario extends React.Component {
               },
               dateHeader: props => {
                 let diaCalendario = props.date;
-                let seleccionado = this.state.diaSeleccionado && utils.esMismoDia(this.state.diaSeleccionado, diaCalendario);
+                let seleccionado = this.state.diaSeleccionado && DateUtils.esMismoDia(this.state.diaSeleccionado, diaCalendario);
                 let conTurnos =
                   _.find(this.state.data, item => {
-                    let fechaTurno = utils.toDateTime(item.fecha);
-                    let mismoDia = utils.esMismoDia(fechaTurno, diaCalendario);
+                    let fechaTurno = DateUtils.toDateTime(item.fecha);
+                    let mismoDia = DateUtils.esMismoDia(fechaTurno, diaCalendario);
                     return item.estadoKeyValue == 1 && mismoDia == true;
                   }) != undefined;
 
@@ -225,7 +226,7 @@ class TurnosDeUsuario extends React.Component {
 
     let titulo = "Mis turnos";
     if (this.state.diaSeleccionado) {
-      titulo = "Mis turnos del dia " + utils.toDateString(this.state.diaSeleccionado);
+      titulo = "Mis turnos del dia " + DateUtils.toDateString(this.state.diaSeleccionado);
     }
     return (
       <MiCard padding={false} rootClassName={classNames(classes.card, this.state.cardVisible && "visible")}>
@@ -255,7 +256,8 @@ class TurnosDeUsuario extends React.Component {
 
     let dataFiltrada = _.filter(this.state.data, item => {
       let cumpleEstado = this.state.filtroEstados[item.estadoKeyValue] == true;
-      let cumpleDia = this.state.diaSeleccionado == undefined || utils.esMismoDia(this.state.diaSeleccionado, utils.toDateTime(item.fecha));
+      let cumpleDia =
+        this.state.diaSeleccionado == undefined || DateUtils.esMismoDia(this.state.diaSeleccionado, DateUtils.toDateTime(item.fecha));
       return cumpleEstado && cumpleDia;
     });
 
@@ -266,6 +268,7 @@ class TurnosDeUsuario extends React.Component {
         check={false}
         rowType={"Turnos"}
         columns={[
+          { id: "codigo", type: "string", numeric: false, label: "Código" },
           { id: "entidadNombre", type: "string", numeric: false, label: "Tipo" },
           { id: "tramiteNombre", type: "string", numeric: false, label: "Trámite" },
           { id: "fecha", type: "date", numeric: false, label: "Fecha" },
@@ -274,13 +277,14 @@ class TurnosDeUsuario extends React.Component {
           { id: "botones", type: "string", numeric: false, label: "" }
         ]}
         rows={dataFiltrada.map(item => {
-          let fecha = utils.toDate(item.fecha);
+          let fecha = DateUtils.toDate(item.fecha);
 
           return {
+            codigo: `${item.codigo}/${item.año}`,
             entidadNombre: item.entidadNombre,
             tramiteNombre: item.tramiteNombre,
-            fecha: utils.toDateString(fecha),
-            hora: utils.transformarDuracion(item.inicio, 5),
+            fecha: DateUtils.toDateString(fecha),
+            hora: DateUtils.transformarDuracion(item.inicio, 5),
             estadoNombre: this.renderColumnaEstado(item),
             botones: this.renderColumnaBotones(item)
           };

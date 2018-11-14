@@ -3,7 +3,7 @@ import React from "react";
 //Componentes
 import { Icon, Typography, Button } from "@material-ui/core";
 import Lottie from "react-lottie";
-import * as animExito from "@Resources/animaciones/anim_success.json";
+import * as animExito from '../_Resources/animaciones/anim_success.json';
 
 //Colores
 import red from "@material-ui/core/colors/red";

@@ -24,7 +24,16 @@ import Button from "@material-ui/core/Button";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { IconButton, Icon, Typography, Grid } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import Icon from "@material-ui/core/Icon";
+import IconButton from "@material-ui/core/IconButton";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControl from "@material-ui/core/FormControl";
+import FormLabel from "@material-ui/core/FormLabel";
 
 //Mis componentes
 import MiPagina from "@Componentes/MiPagina";
@@ -32,7 +41,8 @@ import MiContent from "@Componentes/MiContent";
 import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 
 //Recursos
-import ToolbarLogo from "@Resources/imagenes/toolbar_logo.png";
+import ToolbarLogo from "@Resources/imagenes/escudo_muni_texto_verde.png";
+import ToolbarLogo_Chico from "@Resources/imagenes/escudo_muni_verde.png";
 
 //Rules
 import Rules_Turnero from "@Rules/Rules_Turnero";
@@ -84,12 +94,10 @@ class TurneroCalendario extends React.Component {
     this.setState({ cargando: true }, () => {
       Rules_Turnero.getDetalle(this.state.id)
         .then(data => {
-          console.log(data);
           this.setState({ infoTurnero: data });
           this.buscarInfoDelMes(new Date().getMonth() + 1, new Date().getFullYear());
         })
         .catch(error => {
-          console.log(error);
           this.setState({ error: error, cargando: false });
         });
     });
@@ -122,23 +130,16 @@ class TurneroCalendario extends React.Component {
       let añoFin = dateFin.getFullYear();
       let fechaFin = diaFin + "/" + mesFin + "/" + añoFin;
 
-      console.log(fechaInicio);
-      console.log(fechaFin);
-
       Rules_Turnero.getTurnos({
         idTurnero: this.state.id,
         fechaInicio: fechaInicio,
         fechaFin: fechaFin
       })
         .then(data => {
-          console.log(data);
-
           if (this.state.primeraVez == true) {
             this.setState({ primeraVez: false });
 
             let diaMinimo = _.min(data, "fecha", "inicio");
-            console.log("Dia minimo");
-            console.log(diaMinimo);
             if (diaMinimo != undefined) {
               let partesDia = diaMinimo.fecha.split("T")[0].split("-");
               this.onDiaClick(new Date(partesDia[0], parseInt(partesDia[1]) - 1, partesDia[2]));
@@ -147,7 +148,6 @@ class TurneroCalendario extends React.Component {
           this.setState({ dataDelMes: data });
         })
         .catch(error => {
-          console.log(error);
           this.setState({ error: error });
         })
         .finally(() => {
@@ -192,34 +192,6 @@ class TurneroCalendario extends React.Component {
 
             return e.getDate() == dia && e.getMonth() + 1 == mes && e.getFullYear() == año;
           });
-
-          // let id = 0;
-
-          // eventos = eventos.map(item => {
-          //   let fecha = item.fecha;
-          //   let partes = fecha.split("T")[0].split("-");
-          //   let dia = parseInt(partes[2]);
-          //   let mes = parseInt(partes[1]) - 1;
-          //   let año = parseInt(partes[0]);
-
-          //   let fechaInicio = new Date(año, mes, dia);
-          //   fechaInicio.setMinutes(item.inicio * 5);
-
-          //   let fechaFin = new Date(año, mes, dia);
-          //   fechaFin.setMinutes(item.inicio * 5);
-          //   fechaFin.setMinutes(fechaFin.getMinutes() + item.duracion * 5);
-
-          //   id = id + 1;
-
-          //   return {
-          //     id: id,
-          //     start: fechaInicio,
-          //     end: fechaFin,
-          //     title: "Turno " + item.estadoNombre
-          //   };
-          // });
-
-          // let resultado = eventos;
 
           let agrupados = _.groupBy(eventos, "inicio", "duracion");
 
@@ -268,11 +240,6 @@ class TurneroCalendario extends React.Component {
     mesActual.setMonth(mesActual.getMonth() - 1);
     this.setState({ mesSeleccionado: mesActual, diaSeleccionado: undefined, calendarioDiaVisible: false });
 
-    // if (mesActual.getMonth() < new Date().getMonth()) {
-    //   this.props.mostrarAlerta("No puede sacar un turno en una fecha menor a la actual");
-    //   return;
-    // }
-
     this.buscarInfoDelMes(mesActual.getMonth() + 1, mesActual.getFullYear());
   };
 
@@ -292,7 +259,6 @@ class TurneroCalendario extends React.Component {
   };
 
   onCalendarioDiaEventoClick = e => {
-    console.log(e);
     this.setState({ turnoSeleccionado: e, dialogoTurnoConfirmacionVisible: true });
   };
 
@@ -318,8 +284,6 @@ class TurneroCalendario extends React.Component {
             });
           })
           .catch(error => {
-            console.log(error);
-
             this.setState({
               dialogoTurnoExitoVisible: false,
               dialogoTurnoConfirmacionVisible: false,
@@ -511,7 +475,7 @@ class TurneroCalendario extends React.Component {
           )}
 
           {/* Calendario */}
-          <BigCalendar
+          {/* <BigCalendar
             view="day"
             className={classNames("calendarioDia")}
             date={this.state.diaSeleccionado}
@@ -527,7 +491,7 @@ class TurneroCalendario extends React.Component {
             onSelectEvent={this.onCalendarioDiaEventoClick}
             startAccessor="start"
             endAccessor="end"
-          />
+          /> */}
         </div>
       </div>
     );

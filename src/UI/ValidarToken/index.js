@@ -54,8 +54,8 @@ class ValidarToken extends React.Component {
     let search = location.search;
     if (!search.startsWith("?")) {
       this.props.cerrarSesion();
-      this.props.replace("/Login");
-      // window.location.href = window.Config.URL_LOGIN;
+      // this.props.replace("/Login");
+      window.location.href = window.Config.URL_LOGIN;
       return;
     }
 
@@ -64,8 +64,8 @@ class ValidarToken extends React.Component {
     let token = search.get("token");
     if (token == undefined) {
       this.props.cerrarSesion();
-      this.props.replace("/Login");
-      // window.location.href = window.Config.URL_LOGIN;
+      // this.props.replace("/Login");
+      window.location.href = window.Config.URL_LOGIN;
       return;
     }
 
@@ -75,8 +75,8 @@ class ValidarToken extends React.Component {
           debugger;
 
           this.props.cerrarSesion();
-          this.props.replace("/Login");
-          // window.location.href = window.Config.URL_LOGIN;
+          // this.props.replace("/Login");
+          window.location.href = window.Config.URL_LOGIN;
           return;
         }
 
@@ -91,16 +91,16 @@ class ValidarToken extends React.Component {
             debugger;
 
             this.props.cerrarSesion();
-            this.props.replace("/Login");
-            // window.location.href = window.Config.URL_LOGIN;
+            // this.props.replace("/Login");
+            window.location.href = window.Config.URL_LOGIN;
           });
       })
       .catch(error => {
         debugger;
 
         this.props.cerrarSesion();
-        this.props.replace("/Login");
-        // window.location.href = window.Config.URL_LOGIN;
+        // this.props.replace("/Login");
+        window.location.href = window.Config.URL_LOGIN;
       });
   }
 

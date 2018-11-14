@@ -9,6 +9,9 @@ import styles from "./styles";
 import { Grid, Typography, Button } from "@material-ui/core";
 import Avatar from "@material-ui/core/Avatar";
 
+//Mis compontentes
+import CordobaFilesUtils from "@Componentes/Utils/CordobaFiles";
+
 class PanelTurneroDetalle extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -138,13 +141,10 @@ class PanelTurneroDetalle extends React.PureComponent {
                 <div className={classes.contenedorUsuarios}>
                   <Typography variant="headline">Personal asociado</Typography>
                   {this.props.data.usuariosAsociados.map((usuario, index) => {
+                    let urlFotoUsuario = CordobaFilesUtils.getUrlFotoMiniatura(usuario.identificadorFotoPersonal, usuario.sexoMasculino);
                     return (
                       <div key={index} className={classNames("contenedorUsuario")}>
-                        <Avatar
-                          className={classNames("avatar")}
-                          alt="Adelle Charles"
-                          src={window.Config.URL_CORDOBA_FILES + "/Archivo/" + usuario.identificadorFotoPersonal + "/3"}
-                        />
+                        <Avatar className={classNames("avatar")} alt="Foto del usuario" src={urlFotoUsuario} />
                         <div className={classNames("textos")}>
                           <Typography variant="body2">
                             {usuario.nombre} {usuario.apellido}

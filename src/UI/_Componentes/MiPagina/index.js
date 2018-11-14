@@ -6,7 +6,7 @@ import classNames from "classnames";
 import styles from "./styles";
 
 //Mis componentes
-import MiToolbar from "@Componentes/MiToolbar";
+import MiToolbar from "../MiToolbar";
 
 class MiPagina extends React.PureComponent {
   render() {
@@ -18,31 +18,28 @@ class MiPagina extends React.PureComponent {
           <MiToolbar
             leftIconClick={this.props.toolbarLeftIconClick}
             leftIcon={this.props.toolbarLeftIcon}
-            titulo={this.props.toolbarTitulo}
+            leftIconClassName={this.props.toolbarLeftIconClassName}
             cargando={this.props.cargando}
             className={this.props.toolbarClassName}
             renderLogo={this.props.toolbarRenderLogo}
-          />
+            titulo={this.props.toolbarTitulo}
+            subtitulo={this.props.toolbarSubtitulo}
+            onTituloClick={this.props.onToolbarTituloClick}
+            mostrarUsuario={this.props.toolbarMostrarUsuario}
+            onCerrarSesionClick={this.props.onToolbarCerrarSesionClick}
+            onMiPerfilClick={this.props.onToolbarMiPerfilClick}
+          >
+            {this.props.toolbarChildren}
+          </MiToolbar>
 
           {/* Contenido */}
           <div className={classes.main}>
             <div className={classes.separadorToolbar} />
-            <div
-              className={classNames(
-                classes.content,
-                this.props.contentClassName
-              )}
-            >
-              {this.props.children}
-            </div>
+            <div className={classNames(classes.content, this.props.contentClassName)}>{this.props.children}</div>
           </div>
 
           <div
-            className={classNames(
-              classes.contentOverlayCargando,
-              this.props.cargando == true &&
-                classes.contentOverlayCargandoVisible
-            )}
+            className={classNames(classes.contentOverlayCargando, this.props.cargando == true && classes.contentOverlayCargandoVisible)}
           />
         </div>
       </React.Fragment>

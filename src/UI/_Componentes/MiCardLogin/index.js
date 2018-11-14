@@ -10,7 +10,7 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import { Typography } from "@material-ui/core";
 
 //Mis componentes
-import MiCard from "@Componentes/MiCard";
+import MiCard from "../MiCard";
 
 const PADDING = "32px";
 
@@ -71,7 +71,7 @@ class MiCardLogin extends React.PureComponent {
   renderContent() {
     const { classes } = this.props;
 
-    return <div className={classes.root}>{this.props.children}</div>;
+    return <div className={classNames(classes.root, this.props.className)}>{this.props.children}</div>;
   }
 }
 

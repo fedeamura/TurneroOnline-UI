@@ -1,5 +1,5 @@
 import _ from "lodash";
-import utils from "@Componentes/utils";
+import DateUtils from "@Componentes/Utils/Date";
 
 const metodos = {
   anular: id => {
@@ -47,7 +47,7 @@ const metodos = {
           }
 
           _.forEach(data.return, item => {
-            let fechaTurno = utils.toDateTime(item.fecha);
+            let fechaTurno = DateUtils.toDateTime(item.fecha);
             if (item.estadoKeyValue == 1 && fechaTurno.getTime() < new Date().getTime()) {
               item.estadoKeyValue = -1;
               item.estadoNombre = "Vencido";

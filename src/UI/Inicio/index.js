@@ -12,6 +12,7 @@ import { withRouter } from "react-router-dom";
 //REDUX
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
+import { cerrarSesion } from "@Redux/Actions/usuario";
 
 //Compontes
 import _ from "lodash";
@@ -20,22 +21,24 @@ import Icon from "@material-ui/core/Icon";
 import { Typography, Grid } from "@material-ui/core";
 
 //Mis Componentes
-import MiToolbar from "@Componentes/MiToolbar";
+import MiPagina from "@Componentes/MiPagina";
 import MiContent from "@Componentes/MiContent";
 import CardEntidad from "./CardEntidad";
 import MiCard from "@Componentes/MiCard";
 import TurnoPendiente from "./TurnoPendiente";
-import MiBanerError from "@Componentes/MiBanerError";
+import MiBaner from "@Componentes/MiBaner";
 
 //Recursos
-import ToolbarLogo from "@Resources/imagenes/toolbar_logo.png";
+import ToolbarLogo from "@Resources/imagenes/escudo_muni_texto_verde.png";
+import ToolbarLogo_Chico from "@Resources/imagenes/escudo_muni_verde.png";
 
 //Rules
 import Rules_Entidad from "@Rules/Rules_Entidad";
-import Rules_ReservaTurno  from "@Rules/Rules_ReservaTurno";
+import Rules_ReservaTurno from "@Rules/Rules_ReservaTurno";
 
 const mapStateToProps = state => {
   return {
+    token: state.Usuario.token,
     usuario: state.Usuario.usuario,
     cargando: state.MainContent.cargando
   };
@@ -44,6 +47,9 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   redireccionar: url => {
     dispatch(push(url));
+  },
+  cerrarSesion: () => {
+    dispatch(cerrarSesion());
   }
 });
 
@@ -146,96 +152,95 @@ class App extends React.Component {
     this.props.redireccionar("/MisReservas");
   };
 
+  onCerrarSesionClick = () => {
+    this.props.cerrarSesion();
+  };
+
+  onMiPerfilClick = () => {
+    window.location.href = window.Config.URL_MI_PERFIL + "/#/?token=" + this.props.token;
+  };
+
   render() {
-    const { classes, width, location, usuario } = this.props;
+    const { classes, usuario } = this.props;
     if (usuario == undefined) return null;
 
     return (
       <React.Fragment>
-        <div className={classes.root}>
-          {/* Toolbar */}
-          <MiToolbar
-            paraMobile={this.state.paraMobile}
-            titulo={"Turnero Online"}
-            cargando={this.state.cargando}
-            width={width}
-            renderLogo={this.renderLogo}
-            className={classes.toolbar}
-          />
+        <MiPagina
+          toolbarTitulo={"Turnero Online"}
+          cargando={this.state.cargando}
+          toolbarRenderLogo={this.renderLogo()}
+          toolbarClassName={classes.toolbar}
+          onToolbarTituloClick={this.onToolbarTituloClick}
+          onToolbarMiPerfilClick={this.onMiPerfilClick}
+          onToolbarCerrarSesionClick={this.onCerrarSesionClick}
+        >
+          <MiContent contentClassNames={classes.contentClassNames}>
+            <MiBaner modo="error" visible={this.state.mostrarError} mensaje={this.state.error} />
 
-          {/* Contenido */}
-          <div className={classNames(classes.main)}>
-            <div className={classes.separadorToolbar} />
-            <div className={classes.content}>
-              <MiContent className={classes.content}>
-                <MiBanerError visible={this.state.mostrarError} mensaje={this.state.error} />
+            <MiCard titulo="Mis turnos" rootClassName={classNames(classes.cardMisTurnos, this.state.mostrarCardMisTurnos && "visible")}>
+              <div className={classes.contenedorMisTurnos}>
+                {/* <Typography variant="subheading">Turnos pendientes</Typography> */}
+                {this.state.dataTurnosPendientes.length == 0 ? (
+                  <Typography variant="body1">
+                    No tiene ningun turno pendiente. Si lo desea puede reservar uno seleccionando algún tramite en la parte inferior de esta
+                    página
+                  </Typography>
+                ) : (
+                  <div>
+                    <Typography variant="title" style={{ marginLeft: "16px", marginBottom: "16px" }}>
+                      Próximos turnos:
+                    </Typography>
 
-                <MiCard titulo="Mis turnos" rootClassName={classNames(classes.cardMisTurnos, this.state.mostrarCardMisTurnos && "visible")}>
-                  <div className={classes.contenedorMisTurnos}>
-                    {/* <Typography variant="subheading">Turnos pendientes</Typography> */}
-                    {this.state.dataTurnosPendientes.length == 0 ? (
-                      <Typography variant="body1">
-                        No tiene ningun turno pendiente. Si lo desea puede reservar uno seleccionando algún tramite en la parte inferior de
-                        esta página
+                    {this.state.dataTurnosPendientes.map((item, index) => {
+                      return <TurnoPendiente key={index} data={item} onClick={this.onTurnoPendienteClick} />;
+                    })}
+                    {this.state.cantidadTurnosPendientes > 3 && (
+                      <Typography style={{ marginLeft: "16px" }} variant="body1">
+                        De un total de {this.state.cantidadTurnosPendientes} turnos pendientes
                       </Typography>
-                    ) : (
-                      <div>
-                        <Typography variant="title" style={{ marginLeft: "16px", marginBottom: "16px" }}>
-                         Próximos turnos:
-                        </Typography>
-
-                        {this.state.dataTurnosPendientes.map((item, index) => {
-                          return <TurnoPendiente key={index} data={item} onClick={this.onTurnoPendienteClick} />;
-                        })}
-                        {this.state.cantidadTurnosPendientes > 3 && (
-                          <Typography style={{ marginLeft: "16px" }} variant="body1">
-                            De un total de {this.state.cantidadTurnosPendientes} turnos pendientes
-                          </Typography>
-                        )}
-                      </div>
-                    )}
-
-                    {this.state.dataTurno.length != 0 && (
-                      <div className={classes.misTurnosContenedorBotones}>
-                        <Button color="primary" variant="raised" onClick={this.onBotonMisTurnosClick}>
-                          Ver mis turnos
-                        </Button>
-                      </div>
                     )}
                   </div>
-                </MiCard>
+                )}
 
-                <div style={{ height: 56 }} />
+                {this.state.dataTurno.length != 0 && (
+                  <div className={classes.misTurnosContenedorBotones}>
+                    <Button color="primary" variant="raised" onClick={this.onBotonMisTurnosClick}>
+                      Ver mis turnos
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </MiCard>
 
-                <div className={classNames(classes.cardEntidades, this.state.mostrarCardEntidades && "visible")}>
-                  <Typography style={{ marginLeft: "32px" }} variant="headline" className={classes.titulo}>
-                    Nuevo turno
-                  </Typography>
-                  <Grid container spacing={32}>
-                    {this.state.dataEntidad.map(item => {
-                      return (
-                        <Grid item xs={12} md={6} key={item.id}>
-                          <CardEntidad data={item} onClick={this.onBotonEntidadClick} />
-                        </Grid>
-                      );
-                    })}
-                  </Grid>
-                </div>
-              </MiContent>
+            <div style={{ height: 56 }} />
+
+            <div className={classNames(classes.cardEntidades, this.state.mostrarCardEntidades && "visible")}>
+              <Typography style={{ marginLeft: "32px" }} variant="headline" className={classes.titulo}>
+                Nuevo turno
+              </Typography>
+              <Grid container spacing={32}>
+                {this.state.dataEntidad.map(item => {
+                  return (
+                    <Grid item xs={12} md={6} key={item.id}>
+                      <CardEntidad data={item} onClick={this.onBotonEntidadClick} />
+                    </Grid>
+                  );
+                })}
+              </Grid>
             </div>
-          </div>
-        </div>
-
-        <div className={classNames(classes.contentOverlayCargando, this.state.cargando == true && classes.contentOverlayCargandoVisible)} />
+          </MiContent>
+        </MiPagina>
       </React.Fragment>
     );
   }
 
-  renderLogo = () => {
-    const { classes, width, location, usuario } = this.props;
+  renderLogo() {
+    const { classes, width } = this.props;
 
-    return <div className={classes.logoMuni} style={{ backgroundImage: "url(" + ToolbarLogo + ")" }} />;
-  };
+    let url = isWidthUp("md", width) ? ToolbarLogo : ToolbarLogo_Chico;
+    return <div className={classes.logoMuni} style={{ backgroundImage: "url(" + url + ")" }} />;
+  }
 }
 
 let componente = undefined;

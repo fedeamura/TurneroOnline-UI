@@ -1,246 +1,192 @@
 import React from "react";
+
 import classNames from "classnames";
-import Select from "react-select";
+import styles from "./styles";
 import { withStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import NoSsr from "@material-ui/core/NoSsr";
+
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import withMobileDialog from "@material-ui/core/withMobileDialog";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+
 import TextField from "@material-ui/core/TextField";
-import Paper from "@material-ui/core/Paper";
-import Chip from "@material-ui/core/Chip";
-import MenuItem from "@material-ui/core/MenuItem";
-import CancelIcon from "@material-ui/icons/Cancel";
-import { emphasize } from "@material-ui/core/styles/colorManipulator";
 
-const styles = theme => ({
-  root: {
-    flexGrow: 1,
-    height: 250
-  },
-  input: {
-    display: "flex",
-    padding: 0,
-    "& span": {
-      display: "none"
-    }
-  },
-  valueContainer: {
-    display: "flex",
-    flexWrap: "wrap",
-    flex: 1,
-    alignItems: "center"
-  },
-  chip: {
-    margin: `${theme.spacing.unit / 2}px ${theme.spacing.unit / 4}px`
-  },
-  chipFocused: {
-    backgroundColor: emphasize(
-      theme.palette.type === "light"
-        ? theme.palette.grey[300]
-        : theme.palette.grey[700],
-      0.08
-    )
-  },
-  noOptionsMessage: {
-    padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`
-  },
-  singleValue: {
-    fontSize: 16
-  },
-  placeholder: {
-    position: "absolute",
-    left: 2,
-    fontSize: 16
-  },
-  paper: {
-    position: "absolute",
-    zIndex: 1,
-    marginTop: theme.spacing.unit,
-    left: 0,
-    right: 0
-  },
-  divider: {
-    height: theme.spacing.unit * 2
+import _ from "lodash";
+import { Icon, Typography } from "@material-ui/core";
+
+class MiSelect extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      open: false,
+      busqueda: ""
+    };
   }
-});
 
-function NoOptionsMessage(props) {
-  return (
-    <Typography
-      color="textSecondary"
-      className={props.selectProps.classes.noOptionsMessage}
-      {...props.innerProps}
-    >
-      {props.children}
-    </Typography>
-  );
-}
+  onBotonClick = () => {
+    if (this.props.disabled === true) return;
+    this.setState({ open: true, busqueda: "" });
+  };
 
-function inputComponent({ inputRef, ...props }) {
-  return <div ref={inputRef} {...props} />;
-}
+  onClose = () => {
+    this.setState({ open: false });
+  };
 
-function Control(props) {
-  return (
-    <TextField
-      fullWidth
-      InputProps={{
-        inputComponent,
-        inputProps: {
-          className: props.selectProps.classes.input,
-          inputRef: props.innerRef,
-          children: props.children,
-          ...props.innerProps
-        }
-      }}
-      {...props.selectProps.textFieldProps}
-    />
-  );
-}
+  onClick = value => {
+    let item = _.find(this.props.options, opcion => {
+      return opcion.value === value;
+    });
+    if (item === undefined) return;
 
-function Option(props) {
-  return (
-    <MenuItem
-      buttonRef={props.innerRef}
-      selected={props.isFocused}
-      component="div"
-      style={{
-        fontWeight: props.isSelected ? 500 : 400
-      }}
-      {...props.innerProps}
-    >
-      {props.children}
-    </MenuItem>
-  );
-}
+    this.props.onChange && this.props.onChange(item);
+    this.onClose();
+  };
 
-function Placeholder(props) {
-  return (
-    <Typography
-      color="textSecondary"
-      className={props.selectProps.classes.placeholder}
-      {...props.innerProps}
-    >
-      {props.children}
-    </Typography>
-  );
-}
+  onBusquedaChange = e => {
+    this.setState({ busqueda: e.currentTarget.value });
+  };
 
-function SingleValue(props) {
-  return (
-    <Typography
-      className={props.selectProps.classes.singleValue}
-      {...props.innerProps}
-    >
-      {props.children}
-    </Typography>
-  );
-}
+  onInputRef = ref => {
+    ref && ref.focus();
+  };
 
-function ValueContainer(props) {
-  return (
-    <div className={props.selectProps.classes.valueContainer}>
-      {props.children}
-    </div>
-  );
-}
+  onInputKeyPress = e => {
+    if (e.key === "Enter") {
+      let opcionesFiltradas = _.filter(this.props.options, opcion => {
+        let busqueda = this.transformarTexto(this.state.busqueda);
+        let label = this.transformarTexto(opcion.label);
+        return label.indexOf(busqueda) !== -1;
+      });
 
-function MultiValue(props) {
-  return (
-    <Chip
-      tabIndex={-1}
-      label={props.children}
-      className={classNames(props.selectProps.classes.chip, {
-        [props.selectProps.classes.chipFocused]: props.isFocused
-      })}
-      onDelete={props.removeProps.onClick}
-      deleteIcon={<CancelIcon {...props.removeProps} />}
-    />
-  );
-}
-
-function Menu(props) {
-  return (
-    <Paper
-      square
-      className={props.selectProps.classes.paper}
-      {...props.innerProps}
-    >
-      {props.children}
-    </Paper>
-  );
-}
-
-const components = {
-  Control,
-  Menu,
-  MultiValue,
-  NoOptionsMessage,
-  Option,
-  Placeholder,
-  SingleValue,
-  ValueContainer
-};
-
-let body = undefined;
-class MiSelect extends React.PureComponent {
-  componentDidMount() {}
-
-  onOpen = () => {
-    // let inputWrapper = $(".Select-control")
-    //   .get(0)
-    //   .getBoundingClientRect();
-    // $(".Select-menu-outer").css({
-    //   top: inputWrapper.top + inputWrapper.height + "px",
-    //   left: inputWrapper.left + "px",
-    //   width: inputWrapper.width + "px"
-    // });
-
-    if (this.props.onOpen != undefined) {
-      this.props.onOpen();
+      if (opcionesFiltradas.length === 1) {
+        this.onClick(opcionesFiltradas[0].value);
+      }
     }
+  };
+  render() {
+    let { options, fullScreen, value } = this.props;
+    options = options || [];
+
+    if (
+      this.props.default &&
+      _.find(options, item => {
+        return item.value === this.props.default.value;
+      }) === undefined
+    ) {
+      options.unshift(this.props.default);
+    }
+
+    let opcionSeleccionada = undefined;
+    if (value) {
+      opcionSeleccionada = _.find(this.props.options, item => {
+        return item.value == value;
+      });
+    }
+
+    let opcionesFiltradas = _.filter(options, opcion => {
+      let busqueda = this.transformarTexto(this.state.busqueda);
+      let label = this.transformarTexto(opcion.label);
+      return label.indexOf(busqueda) !== -1;
+    });
+
+    return (
+      <React.Fragment>
+        <Typography variant="body2">{this.props.label}</Typography>
+        <Button
+          onClick={this.onBotonClick}
+          style={{
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+            borderBottom: this.props.disabled === true ? "1px dotted rgba(0, 0, 0, 0.42)" : "1px solid rgba(0, 0, 0, 0.42)",
+            paddingLeft: 0,
+            display: "flex"
+          }}
+        >
+          <Typography style={{ flex: 1, textAlign: "initial", textTransform: "capitalize" }}>
+            {opcionSeleccionada ? opcionSeleccionada.label : "Seleccione..."}
+          </Typography>
+          <Icon>keyboard_arrow_down</Icon>
+        </Button>
+        <Dialog fullScreen={fullScreen} open={this.state.open} onClose={this.onClose}>
+          <DialogContent style={{ padding: 0, display: "flex", flexDirection: "column" }}>
+            <div style={{ minHeight: "fit-content", padding: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Icon style={{ marginRight: "16px" }}>search</Icon>
+                <TextField
+                  inputRef={this.onInputRef}
+                  name="busqueda"
+                  onKeyPress={this.onInputKeyPress}
+                  style={{ flex: 1 }}
+                  placeholder={this.props.placeholderBusqueda || "Buscar..."}
+                  value={this.state.busqueda}
+                  onChange={this.onBusquedaChange}
+                />
+              </div>
+            </div>
+
+            <div style={{ flex: 1, overflow: "auto" }}>
+              <List>
+                {opcionesFiltradas.map(opcion => {
+                  return (
+                    <Item
+                      selected={opcion.value == value}
+                      key={opcion.value}
+                      label={opcion.label}
+                      value={opcion.value}
+                      onClick={this.onClick}
+                    />
+                  );
+                })}
+              </List>
+            </div>
+          </DialogContent>
+
+          <DialogActions>
+            <Button color="primary" onClick={this.onClose}>
+              Volver
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </React.Fragment>
+    );
+  }
+
+  transformarTexto = txt => {
+    if (txt === undefined) return "";
+    txt = txt.toLowerCase();
+    txt = txt.replace(/á/g, "a");
+    txt = txt.replace(/é/g, "e");
+    txt = txt.replace(/í/g, "i");
+    txt = txt.replace(/ó/g, "o");
+    txt = txt.replace(/ú/g, "u");
+    return txt;
+  };
+}
+
+class Item extends React.PureComponent {
+  constructor(props) {
+    super(props);
+  }
+
+  onClick = () => {
+    this.props.onClick && this.props.onClick(this.props.value);
   };
 
   render() {
-    const { classes, theme } = this.props;
-
-    const selectStyles = {
-      input: base => ({
-        ...base,
-        color: theme.palette.text.primary,
-        "& input": {
-          font: "inherit"
-        }
-      })
-    };
-
     return (
-      <NoSsr>
-        <Select
-          classes={classes}
-          onOpen={this.onOpen}
-          styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-          menuPortalTarget={document.body}
-          // menuShouldBlockScroll={true}
-          // className="menu-outer-top"
-          // menuContainerStyle={{ position: "fixed", zIndex: "1500" }}
-          styles={selectStyles}
-          textFieldProps={{
-            label: this.props.label,
-            InputLabelProps: {
-              shrink: true
-            }
-          }}
-          options={this.props.options}
-          components={components}
-          value={this.props.value}
-          onChange={this.props.onChange}
-          placeholder={this.props.placeholder}
-          isMulti={this.props.isMulti}
-          isDisabled={this.props.disabled}
-        />
-      </NoSsr>
+      <ListItem button onClick={this.onClick} selected={this.props.selected}>
+        <ListItemText primary={this.props.label} />
+      </ListItem>
     );
   }
 }
 
-export default withStyles(styles, { withTheme: true })(MiSelect);
+let componente = MiSelect;
+componente = withStyles(styles)(componente);
+componente = withMobileDialog()(componente);
+export default componente;
