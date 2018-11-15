@@ -85,6 +85,17 @@ const metodos = {
     } catch (ex) {
       return false;
     }
+  },
+  toTimeString: fecha => {
+    try {
+      let hora = fecha.getHours();
+      if (hora < 10) hora = "0" + hora;
+      let min = fecha.getMinutes();
+      if (min < 10) min = "0" + min;
+      return hora + ":" + min;
+    } catch (ex) {
+      return "";
+    }
   }
 };
 

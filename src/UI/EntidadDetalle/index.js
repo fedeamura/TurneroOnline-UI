@@ -12,6 +12,7 @@ import { withRouter } from "react-router-dom";
 //REDUX
 import { connect } from "react-redux";
 import { goBack, push } from "connected-react-router";
+import { cerrarSesion } from "@Redux/Actions/usuario";
 
 //Componentes
 import { Grid, Typography, Button } from "@material-ui/core";
@@ -43,6 +44,9 @@ const mapDispatchToProps = dispatch => ({
   },
   redirigir: url => {
     dispatch(push(url));
+  },
+  cerrarSesion: () => {
+    dispatch(cerrarSesion());
   }
 });
 

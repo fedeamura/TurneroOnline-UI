@@ -7,7 +7,7 @@ class MiContent extends React.PureComponent {
     let { classes } = this.props;
 
     return (
-      <div className={classNames(classes.root)}>
+      <div className={classNames(classes.root, this.props.rootClassNames)}>
         <div className={classNames(classes.content, this.props.contentClassNames)}>{this.props.children}</div>
       </div>
     );

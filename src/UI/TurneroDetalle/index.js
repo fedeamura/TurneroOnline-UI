@@ -3,6 +3,7 @@ import React from "react";
 //Styles
 import classNames from "classnames";
 import { withStyles } from "@material-ui/core/styles";
+import withWidth, { isWidthUp } from "@material-ui/core/withWidth";
 import styles from "./styles";
 
 //Router
@@ -11,11 +12,10 @@ import { withRouter } from "react-router-dom";
 //REDUX
 import { connect } from "react-redux";
 import { goBack, push } from "connected-react-router";
+import { cerrarSesion } from "@Redux/Actions/usuario";
 
 //Componentes
-import { Grid, Typography, Button } from "@material-ui/core";
-import Avatar from "@material-ui/core/Avatar";
-// import _ from "lodash";
+import { Grid, Button } from "@material-ui/core";
 
 //Mis componentes
 import MiContent from "@Componentes/MiContent";
@@ -31,7 +31,7 @@ import ToolbarLogo_Chico from "@Resources/imagenes/escudo_muni_verde.png";
 import Rules_Turnero from "@Rules/Rules_Turnero";
 
 const mapStateToProps = state => {
-  return {};
+  return { token: state.Usuario.token };
 };
 
 const mapDispatchToProps = dispatch => ({
@@ -40,6 +40,9 @@ const mapDispatchToProps = dispatch => ({
   },
   redirigir: url => {
     dispatch(push(url));
+  },
+  cerrarSesion: () => {
+    dispatch(cerrarSesion());
   }
 });
 
@@ -76,6 +79,14 @@ class TurneroDetalle extends React.Component {
     });
   }
 
+  onCerrarSesionClick = () => {
+    this.props.cerrarSesion();
+  };
+
+  onMiPerfilClick = () => {
+    window.location.href = window.Config.URL_MI_PERFIL + "/#/?token=" + this.props.token;
+  };
+
   onBotonTurneroCalendarioClick = () => {
     this.props.redirigir("/TurneroCalendario/" + this.state.id);
   };
@@ -89,12 +100,14 @@ class TurneroDetalle extends React.Component {
           cargando={this.state.cargando}
           toolbarTitulo="Turnero online"
           toolbarClassName={classes.toolbar}
-          toolbarRenderLogo={this.renderToolbarLogo}
+          toolbarRenderLogo={this.renderToolbarLogo()}
           toolbarLeftIcon="arrow_back"
           toolbarLeftIconClick={this.props.goBack}
-          contentClassName={classes.paginaContent}
+          onToolbarTituloClick={this.onToolbarTituloClick}
+          onToolbarMiPerfilClick={this.onMiPerfilClick}
+          onToolbarCerrarSesionClick={this.onCerrarSesionClick}
         >
-          <MiContent className={classes.content}>
+          <MiContent contentClassNames={classes.contentClassNames}>
             {this.state.data != undefined && (
               <div className={classNames(classes.card, this.state.cardVisible && "visible")}>
                 <MiCard>
@@ -121,11 +134,11 @@ class TurneroDetalle extends React.Component {
     );
   }
 
-  renderToolbarLogo = () => {
-    const { classes } = this.props;
-
-    return <div className={classes.logoMuni} style={{ backgroundImage: "url(" + ToolbarLogo + ")" }} />;
-  };
+  renderToolbarLogo() {
+    const { classes, width } = this.props;
+    let url = isWidthUp("md", width) ? ToolbarLogo : ToolbarLogo_Chico;
+    return <div className={classes.logoMuni} style={{ backgroundImage: "url(" + url + ")" }} />;
+  }
 }
 
 let componente = TurneroDetalle;
@@ -134,5 +147,6 @@ componente = connect(
   mapDispatchToProps
 )(componente);
 componente = withStyles(styles)(componente);
+componente = withWidth()(componente);
 componente = withRouter(componente);
 export default componente;

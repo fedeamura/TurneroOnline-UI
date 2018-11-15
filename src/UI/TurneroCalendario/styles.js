@@ -1,30 +1,51 @@
+import orange from "@material-ui/core/colors/orange";
+
 const styles = theme => {
   return {
     paginaContent: {
-      display: "flex"
-    },
-    content: {
       overflow: "auto",
-      flex: 1
+      [theme.breakpoints.up("md")]: {
+        overflow: "hidden"
+      }
+    },
+    rootClassNames: {
+      [theme.breakpoints.up("md")]: {
+        height: "100%"
+      }
+    },
+    contentClassNames: {
+      display: "flex",
+      flexDirection: "column",
+      height: "100%"
+    },
+    grid: {
+      
     },
     toolbar: {
       backgroundColor: "white",
       "& h2": {
         color: "black"
       },
-      "& .material-icons": {
+      "& h3": {
         color: "black"
-      }
+      },
+      color: "black"
     },
     logoMuni: {
-      marginRight: "16px",
+      marginRight: "8px",
       backgroundPosition: "center",
-      minWidth: "126px",
-      maxWidth: "126px",
-      minHeight: "56px",
-      maxHeight: "56px",
+      minWidth: "40px",
+      maxWidth: "40px",
+      minHeight: "40px",
+      maxHeight: "40px",
       backgroundRepeat: "no-repeat",
-      backgroundSize: "contain"
+      backgroundSize: "contain",
+      [theme.breakpoints.up("md")]: {
+        marginRight: "16px",
+        flexDirection: "row",
+        minWidth: "126px",
+        maxWidth: "126px"
+      }
     },
     card: {
       opacity: 0,
@@ -35,64 +56,20 @@ const styles = theme => {
         transform: "translateY(0px)"
       }
     },
-    contenedorLinksInteres: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "flex-start"
-    },
     linkInteres: {
+      cursor: "pointer",
+      textDecoration: "underline",
       color: theme.palette.primary.main,
       "&:hover": {
         fontWeight: "bold"
       }
     },
-    contenedorUbicaciones: {},
-    contenedorUbicacion: {
-      display: "flex"
-    },
-    contenedorUbicacionTextos: {},
-    mapaUbicacion: {
-      marginRight: "16px",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      borderRadius: "16px",
-      width: "156px",
-      height: "156px"
-    },
-    ubicacionBotonMapa: {
-      marginTop: "16px"
-    },
-    contenedorRequisitos: {
-      "& > .contenedorRequisito:not(:last-child)": {
-        marginBottom: "16px"
-      }
-    },
-    contenedorLinksRequisito: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "flex-start"
-    },
-    contenedorUsuarios: {
-      "& > .contenedorUsuario": {
-        display: "flex",
-        alignItems: "center",
-        marginBottom: "8px",
-        "& > .avatar": {
-          marginRight: "8px"
-        },
-        "& > .textos": {}
-      }
-    },
     contenedorBotones: {
       display: "flex",
-      justifyContent: "flex-end"
+      justifyContent: "flex-end",
+      padding: theme.spacing.unit
     },
-    diaSeleccionado: {
-      position: "absolute",
-      width: "100%",
-      height: "100%",
-      backgroundColor: "red"
-    },
+
     contenedorInfo: {
       margin: "8px",
       display: "flex",
@@ -113,6 +90,103 @@ const styles = theme => {
     },
     indicadorInfoTurnoDisponible: {
       backgroundColor: "#149257"
+    },
+    contenedorCalendario: {
+      marginBottom: theme.spacing.unit * 2
+    },
+    calendario: {
+      height: "350px"
+    },
+    calendarioEncabezado: {
+      display: "flex",
+      alignItems: "center",
+      paddingLeft: "8px",
+      backgroundColor: "rgba(0, 0, 0, 0.025)",
+      padding: theme.spacing.unit,
+      paddingLeft: theme.spacing.unit * 2,
+      borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+      marginBottom: theme.spacing.unit * 2,
+      "& .titulo": {
+        flex: 1
+      }
+    },
+    contenedorCalendarioRoot: {
+      // height: "100%",
+      display: "flex",
+      opacity: 0,
+      transform: "translateY(50px)",
+      transition: "all 0.3s",
+      pointerEvents: "none",
+      "&.visible": {
+        opacity: 1,
+        transform: "translateY(0px)",
+        pointerEvents: "all"
+      }
+    },
+    contenedorCalendarioDia: {
+      // height: "100%",
+      "& > div": {
+        display: "flex",
+        flexDirection: "column",
+        // backgroundColor: 'white',
+        // border-radius: 16px;
+        height: "100%"
+        // overflow: hidden;
+        // box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+        // display: flex;
+        // flex-direction: column;
+        // width: 100%;
+      }
+    },
+    colCalendario: {
+      paddingRight: 0,
+      [theme.breakpoints.up("md")]: {
+        paddingRight: theme.spacing.unit * 4
+      }
+    },
+    colCalendarioDia: {
+      display: "flex"
+    },
+    encabezadoTurnosDeDia: {
+      display: "flex",
+      alignItems: "center",
+      paddingLeft: "8px",
+      backgroundColor: "rgba(0, 0, 0, 0.025)",
+      padding: theme.spacing.unit,
+      paddingLeft: theme.spacing.unit * 2,
+      borderBottom: "1px solid rgba(0, 0, 0, 0.1)"
+    },
+    contenedorTurnos: {
+      flex: 1,
+      padding: theme.spacing.unit,
+      overflow: "auto"
+    },
+    contenedorSeleccioneUnTurno: {
+      padding: theme.spacing.unit,
+      paddingBottom: 0
+    },
+    contenedorSinEventos: {
+      padding: theme.spacing.unit,
+      backgroundColor: orange["500"]
+    },
+    contenedorInfoTurnero: {
+      display: "flex",
+      marginBottom: theme.spacing.unit * 4,
+      alignItems: "center",
+      opacity: 0,
+      transition: "all 0.3s",
+      "& .imagen": {
+        backgroundSize: "cover",
+        backgroundPosition: "center"
+
+        // borderRadius: theme.spacing.unit
+      },
+      "&.visible": {
+        opacity: 1
+      }
+    },
+    imagenTurnero: {
+      marginRight: theme.spacing.unit * 2
     }
   };
 };

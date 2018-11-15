@@ -34,8 +34,8 @@ const styles = theme => {
     menuUsuario: {
       "& div:nth-child(2)": {
         width: "20rem",
-        minWidth: "20rem",
-        maxWidth: "20rem"
+        // minWidth: "20rem",
+        maxWidth: "calc(100% - 2rem)"
       },
       "& ul": {
         paddingTop: 0
