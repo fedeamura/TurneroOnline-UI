@@ -33,9 +33,9 @@ const mapDispatchToProps = dispatch => ({});
 
 function desc(a, b, orderBy, orderType) {
   switch (orderType) {
-    case "date":
-      var dateB = b[orderBy].split("/");
-      var dateA = a[orderBy].split("/");
+    case "date": {
+      let dateA = a[orderBy].split("/");
+      let dateB = b[orderBy].split("/");
 
       dateB = new Date(dateB[1] + "/" + dateB[0] + "/" + dateB[2]);
       dateA = new Date(dateA[1] + "/" + dateA[0] + "/" + dateA[2]);
@@ -46,7 +46,40 @@ function desc(a, b, orderBy, orderType) {
         return 1;
       }
       return 0;
-    default:
+    }
+
+    case "datetime": {
+      try {
+        let partesA = a[orderBy].split(" ");
+        let parteDiaA = partesA[0].split("/");
+        let partesHoraA = partesA[1].split(":");
+
+        let partesB = b[orderBy].split(" ");
+        let parteDiaB = partesB[0].split("/");
+        let partesHoraB = partesB[1].split(":");
+
+        let dateA = new Date(parteDiaA[1] + "/" + parteDiaA[0] + "/" + parteDiaA[2]);
+        dateA.setHours(partesHoraA[0]);
+        dateA.setMinutes(partesHoraA[1]);
+
+        let dateB = new Date(parteDiaB[1] + "/" + parteDiaB[0] + "/" + parteDiaB[2]);
+        dateB.setHours(partesHoraB[0]);
+        dateB.setMinutes(partesHoraB[1]);
+
+        if (dateB < dateA) {
+          return -1;
+        }
+        if (dateB > dateA) {
+          return 1;
+        }
+        return 0;
+      } catch ({ message }) {
+        console.log(message);
+        return 0;
+      }
+    }
+
+    default: {
       if (b[orderBy] < a[orderBy]) {
         return -1;
       }
@@ -54,6 +87,7 @@ function desc(a, b, orderBy, orderType) {
         return 1;
       }
       return 0;
+    }
   }
 }
 
@@ -101,7 +135,7 @@ class EnhancedTableHead extends React.Component {
                 className={classes.tableCell}
                 key={row.id}
                 numeric={row.numeric}
-                padding={"default"}
+                padding={"dense"}
                 sortDirection={orderBy === row.id ? order : false}
               >
                 <TableSortLabel
@@ -272,7 +306,7 @@ class MiTabla extends React.Component {
                 })}
               {emptyRows > 0 && (
                 <TableRow style={{ height: (this.props.rowHeight || 49) * emptyRows }}>
-                  <TableCell colSpan={6} padding="default" />
+                  <TableCell colSpan={6} padding="dense" />
                 </TableRow>
               )}
             </TableBody>
@@ -332,25 +366,15 @@ class MiRow extends React.PureComponent {
           if (cell == "data") return; //'data' son datos extras para utilizar
           return (
             cell != "id" && (
-              <TableCell className={classes.tableCell} key={cell} padding="default">
+              <TableCell className={classes.tableCell} key={cell} padding="dense">
                 {this.props.data[cell]}
               </TableCell>
             )
           );
         })}
-        {/* {this.renderCustomCell()} */}
       </TableRow>
     );
   }
-
-  // renderCustomCell = () => {
-  //   return <TableCell padding="none">{this.renderCustomCellContent()}</TableCell>;
-  // };
-
-  // renderCustomCellContent = () => {
-  //   if (this.props.customCell == undefined) return null;
-  //   return this.props.customCell(this.props.data);
-  // };
 }
 
 MiTabla.propTypes = {

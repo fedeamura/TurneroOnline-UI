@@ -1,13 +1,13 @@
-import { MAIN_CONTENT_CARGANDO } from "@Redux/Constants/index";
+import { DRAWER_TOGGLE } from "@Redux/Constants/index";
 
 const initialState = {
-  cargando: false
+  open: false
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case MAIN_CONTENT_CARGANDO: {
-      return { ...state, cargando: action.payload };
+    case DRAWER_TOGGLE: {
+      return { ...state, open: !state.open };
     }
     default:
       return state;

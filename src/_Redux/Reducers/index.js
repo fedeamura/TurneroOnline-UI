@@ -1,15 +1,17 @@
 import Usuario from "./usuario";
 import Alerta from "./alerta";
-import MainContent from "./mainContent";
 import Notificaciones from "./notificaciones";
+import Entidades from "./entidades";
+import Drawer from "./drawer";
 
 import { combineReducers } from "redux";
 
 const rootReducer = combineReducers({
   Usuario,
   Alerta,
-  MainContent,
-  Notificaciones
+  Entidades,
+  Notificaciones,
+  Drawer
 });
 
 export default rootReducer;

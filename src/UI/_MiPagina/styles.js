@@ -1,19 +1,9 @@
-import orange from "@material-ui/core/colors/orange";
-
 const styles = theme => {
   return {
     paginaContent: {
-      overflow: "auto",
-      [theme.breakpoints.up("md")]: {
-        overflow: "hidden"
-      }
+      overflow: "auto"
     },
-    rootClassNames: {
-      [theme.breakpoints.up("md")]: {
-        height: "100%"
-      }
-    },
-    contentClassNames: {
+    contentClassName: {
       display: "flex",
       flexDirection: "column",
       height: "100%"

@@ -37,12 +37,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 import MiCard from "@Componentes/MiCard";
 import _MiPagina from "../_MiPagina";
-
 import DateUtils from "@Componentes/Utils/Date";
-
-//Recursos
-import ToolbarLogo from "@Resources/imagenes/escudo_muni_texto_verde.png";
-import ToolbarLogo_Chico from "@Resources/imagenes/escudo_muni_verde.png";
 
 //Rules
 import Rules_Turnero from "@Rules/Rules_Turnero";
@@ -343,15 +338,15 @@ class TurneroCalendario extends React.Component {
       <React.Fragment>
         <_MiPagina
           cargando={this.state.cargando}
-          toolbarTitulo="Turnero online"
-          toolbarLeftIcon="arrow_back"
-          toolbarLeftIconClick={this.props.goBack}
+          contentClassName={classes.contentClassName}
+          miContentContentClassName={classes.miContentContentClassName}
+          miContentRootClassName={classes.miContentRootClassName}
         >
           <React.Fragment>
             {this.renderInfoContextual()}
 
             <Grid container className={classes.grid}>
-              <Grid item xs={12} md={5} className={classes.colCalendario}>
+              <Grid item xs={12} md={5} className={classNames(classes.colCalendario, this.state.infoTurnero  && "visible")}>
                 {this.renderCalendarioMes()}
               </Grid>
 
@@ -705,27 +700,6 @@ class TurneroCalendario extends React.Component {
         </DialogActions>
       </Dialog>
     );
-  }
-
-  // eventStyleGetter = (event, start, end, isSelected) => {
-  //   var style = {
-  //     backgroundColor: "#149257",
-  //     borderRadius: "0px",
-  //     color: "white",
-  //     border: "none",
-  //     borderBottom: "1px solid rgba(255,255,255,0.2)",
-  //     display: "block"
-  //   };
-
-  //   return {
-  //     style: style
-  //   };
-  // };
-
-  renderToolbarLogo() {
-    const { classes, width } = this.props;
-    let url = isWidthUp("md", width) ? ToolbarLogo : ToolbarLogo_Chico;
-    return <div className={classes.logoMuni} style={{ backgroundImage: "url(" + url + ")" }} />;
   }
 }
 

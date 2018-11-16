@@ -21,16 +21,11 @@ import Checkbox from "@material-ui/core/Checkbox";
 import { IconButton, Icon, Grid, Button } from "@material-ui/core";
 
 //Mis componentes
-import MiContent from "@Componentes/MiContent";
-import MiPagina from "@Componentes/MiPagina";
 import MiCard from "@Componentes/MiCard";
 import MiBaner from "@Componentes/MiBaner";
 import MiTabla from "@Componentes/MiTabla";
 import DateUtils from "@Componentes/Utils/Date";
-
-//Recursos
-import ToolbarLogo from "@Resources/imagenes/escudo_muni_texto_verde.png";
-import ToolbarLogo_Chico from "@Resources/imagenes/escudo_muni_verde.png";
+import _MiPagina from "../_MiPagina";
 
 //Rules
 import Rules_ReservaTurno from "@Rules/Rules_ReservaTurno";
@@ -80,14 +75,30 @@ class TurnosDeUsuario extends React.Component {
           Rules_ReservaTurno.getDeUsuarioLogeado()
             .then(data => {
               let filtroEstados = {};
+
+              let estadoParametro = this.props.match.params.estado;
+
               _.forEach(estados, estado => {
-                filtroEstados["" + estado.keyValue] = estado.keyValue == 1;
+                if (estadoParametro !== undefined) {
+                  filtroEstados["" + estado.keyValue] = estado.keyValue == estadoParametro;
+                } else {
+                  filtroEstados["" + estado.keyValue] = true;
+                }
               });
+
+              if (estadoParametro === undefined) {
+                filtroEstados["-1"] = true;
+              } else {
+                if (estadoParametro == -1) {
+                  filtroEstados["-1"] = true;
+                }
+              }
 
               this.setState({
                 data: data,
                 cardVisible: true,
                 estadosReservaTurno: estados,
+                mostrarFiltros: estadoParametro != undefined,
                 filtroEstados: filtroEstados
               });
             })
@@ -118,10 +129,18 @@ class TurnosDeUsuario extends React.Component {
     if (this.state.diaSeleccionado && this.state.diaSeleccionado.getDate() == dia.getDate()) {
       this.setState({ diaSeleccionado: undefined });
     } else {
-      let filtroEstados = this.state.filtroEstados;
-      filtroEstados["1"] = true;
-      this.setState({ diaSeleccionado: dia, filtroEstados: filtroEstados });
+      this.setState({ diaSeleccionado: dia });
     }
+  };
+
+  cancelarFiltros = () => {
+    let filtroEstados = {};
+    filtroEstados["-1"] = true;
+    this.state.estadosReservaTurno.forEach(estado => {
+      filtroEstados["" + estado.keyValue] = true;
+    });
+
+    this.setState({ diaSeleccionado: undefined, filtroEstados: filtroEstados, mostrarFiltros: false });
   };
 
   render() {
@@ -129,23 +148,10 @@ class TurnosDeUsuario extends React.Component {
 
     return (
       <React.Fragment>
-        <MiPagina
-          cargando={this.state.cargando}
-          toolbarTitulo="Turnero online"
-          toolbarClassName={classes.toolbar}
-          toolbarRenderLogo={this.renderToolbarLogo}
-          toolbarLeftIcon="arrow_back"
-          toolbarLeftIconClick={this.props.goBack}
-          contentClassName={classes.paginaContent}
-        >
-          <Grid container>
-            {this.state.mostrarError && (
-              <Grid item xs={12}>
-                {/* <MiContent className={classes.content} contentClassName={classes.miContentContent}> */}
-                <MiBaner modo="error" mensaje={this.state.error} visible={this.state.mostrarError} />
-              </Grid>
-            )}
+        <_MiPagina cargando={this.state.cargando} full>
+          <MiBaner modo="error" mensaje={this.state.error} visible={this.state.mostrarError} />
 
+          <Grid container>
             <Grid item xs={12}>
               <Grid container spacing={16}>
                 <Grid item xs={12} md={4} lg={3}>
@@ -158,104 +164,161 @@ class TurnosDeUsuario extends React.Component {
               </Grid>
             </Grid>
           </Grid>
-
-          {/* </MiContent> */}
-        </MiPagina>
+        </_MiPagina>
       </React.Fragment>
     );
   }
 
-  renderCalendario = () => {
+  renderCalendario() {
     const { classes } = this.props;
+
+    let tieneFiltros = false;
+    let filtroEstados = [];
+    let conFiltroEstados = false;
+
+    if (this.state.estadosReservaTurno.length != 0) {
+      for (let filtroEstado in this.state.filtroEstados) {
+        if (this.state.filtroEstados[filtroEstado] === true) {
+          if (filtroEstado == -1) {
+            filtroEstados.push("Vencido");
+          } else {
+            let estado = _.find(this.state.estadosReservaTurno, estadoReserva => estadoReserva.keyValue == filtroEstado);
+            filtroEstados.push(estado.nombre);
+          }
+        }
+      }
+
+      conFiltroEstados =
+        filtroEstados.length != 0 && filtroEstados.length != this.state.estadosReservaTurno.length + 1 && filtroEstados.length != 0;
+      tieneFiltros = this.state.diaSeleccionado != undefined || conFiltroEstados;
+    }
 
     return (
-      <MiCard padding={false} className={classes.cardCalendario}>
-        <BigCalendar
-          view="month"
-          date={this.state.dia}
-          className={classNames("calendarioMes")}
-          views={{ month: true }}
-          culture="es"
-          localizer={localizer}
-          onDrillDown={this.onDiaClick}
-          events={[]}
-          startAccessor="start"
-          endAccessor="end"
-          components={{
-            month: {
-              toolbar: props => {
-                return (
-                  <CalendarioMes_Encabezado
-                    props={props}
-                    onBotonMesAnteriorClick={this.onBotonMesAnteriorClick}
-                    onBotonMesSiguienteClick={this.onBotonMesSiguienteClick}
-                  />
-                );
-              },
-              dateHeader: props => {
-                let diaCalendario = props.date;
-                let seleccionado = this.state.diaSeleccionado && DateUtils.esMismoDia(this.state.diaSeleccionado, diaCalendario);
-                let conTurnos =
-                  _.find(this.state.data, item => {
-                    let fechaTurno = DateUtils.toDateTime(item.fecha);
-                    let mismoDia = DateUtils.esMismoDia(fechaTurno, diaCalendario);
-                    return item.estadoKeyValue == 1 && mismoDia == true;
-                  }) != undefined;
+      <React.Fragment>
+        <MiCard padding={false} className={classNames(classes.contenedorCalendario)}>
+          <BigCalendar
+            view="month"
+            date={this.state.dia}
+            className={classNames(classes.calendario)}
+            views={{ month: true }}
+            culture="es"
+            localizer={localizer}
+            onDrillDown={this.onDiaClick}
+            events={[]}
+            startAccessor="start"
+            endAccessor="end"
+            components={{
+              month: {
+                toolbar: props => {
+                  return (
+                    <CalendarioMes_Encabezado
+                      props={props}
+                      classes={classes}
+                      onBotonMesAnteriorClick={this.onBotonMesAnteriorClick}
+                      onBotonMesSiguienteClick={this.onBotonMesSiguienteClick}
+                    />
+                  );
+                },
+                dateHeader: props => {
+                  let diaCalendario = props.date;
+                  let seleccionado = this.state.diaSeleccionado && DateUtils.esMismoDia(this.state.diaSeleccionado, diaCalendario);
+                  let conTurnos =
+                    _.find(this.state.data, item => {
+                      let fechaTurno = DateUtils.toDateTime(item.fecha);
+                      let mismoDia = DateUtils.esMismoDia(fechaTurno, diaCalendario);
+                      return item.estadoKeyValue == 1 && mismoDia == true;
+                    }) != undefined;
 
-                return (
-                  <CalendarioMes_Dia
-                    deshabilitado={false}
-                    conTurnos={false}
-                    classes={classes}
-                    seleccionado={seleccionado}
-                    conTurnos={conTurnos}
-                    onClick={this.onDiaClick}
-                    props={props}
-                  />
-                );
+                  return (
+                    <CalendarioMes_Dia
+                      deshabilitado={false}
+                      conTurnos={false}
+                      classes={classes}
+                      seleccionado={seleccionado}
+                      conTurnos={conTurnos}
+                      onClick={this.onDiaClick}
+                      props={props}
+                    />
+                  );
+                }
               }
-            }
-          }}
-        />
-      </MiCard>
-    );
-  };
+            }}
+          />
+        </MiCard>
+        {tieneFiltros === true && (
+          <MiCard className={classes.cardInfoFiltroDia}>
+            <div>
+              <Typography variant="body2">Filtros activos</Typography>
+              <div style={{ height: 8 }} />
+              {this.state.diaSeleccionado && (
+                <Typography variant="body1">
+                  <b>Dia: </b>
+                  {DateUtils.toDateString(this.state.diaSeleccionado)}
+                </Typography>
+              )}
 
-  renderContenedorTabla = () => {
+              {conFiltroEstados == true && (
+                <Typography>
+                  <b>Estados: </b>
+                  {filtroEstados.join(", ")}
+                </Typography>
+              )}
+              <div style={{ height: 16 }} />
+
+              <Button variant="outlined" color="primary" onClick={this.cancelarFiltros}>
+                Ver todos los turnos
+              </Button>
+            </div>
+          </MiCard>
+        )}
+      </React.Fragment>
+    );
+  }
+
+  renderContenedorTabla() {
     const { classes } = this.props;
 
-    let titulo = "Mis turnos";
+    let titulo = "Todos mis turnos";
     if (this.state.diaSeleccionado) {
       titulo = "Mis turnos del dia " + DateUtils.toDateString(this.state.diaSeleccionado);
     }
     return (
-      <MiCard padding={false} rootClassName={classNames(classes.card, this.state.cardVisible && "visible")}>
-        <div className={classes.contenedorTabla}>
-          <div className="main">
-            <div className={classes.contenedorTitulo}>
-              <Typography variant="title">{titulo}</Typography>
-              <Button
-                variant="outlined"
-                onClick={this.onBotonFiltrosClick}
-                className={classNames(classes.botonFiltro, this.state.mostrarFiltros == false && "visible")}
-              >
-                <Icon style={{ marginRight: "8px" }}>{"filter_list"}</Icon>
-                Filtros
-              </Button>
+      <React.Fragment>
+        <MiCard padding={false} rootClassName={classNames(classes.card, this.state.cardVisible && "visible")}>
+          <div className={classes.contenedorTabla}>
+            <div className="main">
+              <div className={classes.contenedorTitulo}>
+                <Typography variant="title">{titulo}</Typography>
+                <Button
+                  variant="outlined"
+                  onClick={this.onBotonFiltrosClick}
+                  className={classNames(classes.botonFiltro, this.state.mostrarFiltros == false && "visible")}
+                >
+                  <Icon style={{ marginRight: "8px" }}>{"filter_list"}</Icon>
+                  Filtros
+                </Button>
+              </div>
+              {this.renderTabla()}
             </div>
-            {this.renderTabla()}
+            {this.renderFiltros()}
           </div>
-          {this.renderFiltros()}
-        </div>
-      </MiCard>
+        </MiCard>
+      </React.Fragment>
     );
-  };
+  }
 
-  renderTabla = () => {
+  renderTabla() {
     const { classes } = this.props;
 
+    let cantidadDeEstadosCheckeados = 0;
+    for (let filtroEstado in this.state.filtroEstados) {
+      if (this.state.filtroEstados[filtroEstado] === true) {
+        cantidadDeEstadosCheckeados += 1;
+      }
+    }
+
     let dataFiltrada = _.filter(this.state.data, item => {
-      let cumpleEstado = this.state.filtroEstados[item.estadoKeyValue] == true;
+      let cumpleEstado = cantidadDeEstadosCheckeados == 0 || this.state.filtroEstados[item.estadoKeyValue] == true;
       let cumpleDia =
         this.state.diaSeleccionado == undefined || DateUtils.esMismoDia(this.state.diaSeleccionado, DateUtils.toDateTime(item.fecha));
       return cumpleEstado && cumpleDia;
@@ -269,22 +332,20 @@ class TurnosDeUsuario extends React.Component {
         rowType={"Turnos"}
         columns={[
           { id: "codigo", type: "string", numeric: false, label: "Código" },
-          { id: "entidadNombre", type: "string", numeric: false, label: "Tipo" },
+          // { id: "entidadNombre", type: "string", numeric: false, label: "Tipo" },
           { id: "tramiteNombre", type: "string", numeric: false, label: "Trámite" },
-          { id: "fecha", type: "date", numeric: false, label: "Fecha" },
-          { id: "hora", type: "string", numeric: false, label: "Hora" },
+          { id: "fecha", type: "datetime", numeric: false, label: "Fecha" },
           { id: "estadoNombre", type: "string", numeric: false, label: "Estado" },
           { id: "botones", type: "string", numeric: false, label: "" }
         ]}
         rows={dataFiltrada.map(item => {
-          let fecha = DateUtils.toDate(item.fecha);
+          let fecha = DateUtils.toDateTime(item.fecha);
 
           return {
-            codigo: `${item.codigo}/${item.año}`,
-            entidadNombre: item.entidadNombre,
+            codigo: this.renderColumnaCodigo(item),
+            // entidadNombre: item.entidadNombre,
             tramiteNombre: item.tramiteNombre,
-            fecha: DateUtils.toDateString(fecha),
-            hora: DateUtils.transformarDuracion(item.inicio, 5),
+            fecha: DateUtils.toDateTimeString(fecha),
             estadoNombre: this.renderColumnaEstado(item),
             botones: this.renderColumnaBotones(item)
           };
@@ -292,9 +353,24 @@ class TurnosDeUsuario extends React.Component {
         orderBy={"fecha"}
       />
     );
-  };
+  }
 
-  renderColumnaEstado = data => {
+  renderColumnaCodigo(data) {
+    const { classes } = this.props;
+
+    return (
+      <Typography
+        onClick={() => {
+          this.props.redirigir("/Reserva/" + data.id);
+        }}
+        variant="body1"
+        style={{ textDecoration: "underline", cursor: "pointer" }}
+        color="primary"
+      >{`${data.codigo}/${data.año}`}</Typography>
+    );
+  }
+
+  renderColumnaEstado(data) {
     const { classes } = this.props;
 
     return (
@@ -303,9 +379,9 @@ class TurnosDeUsuario extends React.Component {
         <Typography>{data.estadoNombre}</Typography>
       </div>
     );
-  };
+  }
 
-  renderFiltros = () => {
+  renderFiltros() {
     const { classes } = this.props;
 
     return (
@@ -364,9 +440,9 @@ class TurnosDeUsuario extends React.Component {
         </div>
       </div>
     );
-  };
+  }
 
-  renderColumnaBotones = data => {
+  renderColumnaBotones(data) {
     return (
       <div>
         <IconButton
@@ -378,13 +454,7 @@ class TurnosDeUsuario extends React.Component {
         </IconButton>
       </div>
     );
-  };
-
-  renderToolbarLogo = () => {
-    const { classes } = this.props;
-
-    return <div className={classes.logoMuni} style={{ backgroundImage: "url(" + ToolbarLogo + ")" }} />;
-  };
+  }
 }
 
 class CalendarioMes_Encabezado extends React.PureComponent {
@@ -400,7 +470,7 @@ class CalendarioMes_Encabezado extends React.PureComponent {
 
   render() {
     return (
-      <div className={classNames("calendarioMes_encabezado")}>
+      <div className={classNames(this.props.classes.calendarioEncabezado)}>
         <Typography className={classNames("titulo")} variant="headline">
           {this.props.props.label}
         </Typography>

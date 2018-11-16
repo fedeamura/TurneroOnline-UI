@@ -1,37 +1,7 @@
+import yellow from "@material-ui/core/colors/yellow";
+
 const styles = theme => {
   return {
-    paginaContent: {
-      display: "flex",
-      overflow: "hidden",
-      overflowY: "auto",
-      padding: "16px"
-    },
-    content: {
-      overflow: "auto",
-      flex: 1
-    },
-    miContentContent: {
-      maxWidth: "70rem"
-    },
-    toolbar: {
-      backgroundColor: "white",
-      "& h2": {
-        color: "black"
-      },
-      "& .material-icons": {
-        color: "black"
-      }
-    },
-    logoMuni: {
-      marginRight: "16px",
-      backgroundPosition: "center",
-      minWidth: "126px",
-      maxWidth: "126px",
-      minHeight: "56px",
-      maxHeight: "56px",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "contain"
-    },
     card: {
       opacity: 0,
       transform: "translateY(100px)",
@@ -100,6 +70,22 @@ const styles = theme => {
         height: "100%"
       }
     },
+    calendario: {
+      height: "350px"
+    },
+    calendarioEncabezado: {
+      display: "flex",
+      alignItems: "center",
+      paddingLeft: "8px",
+      backgroundColor: "rgba(0, 0, 0, 0.025)",
+      padding: theme.spacing.unit,
+      paddingLeft: theme.spacing.unit * 2,
+      borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+      marginBottom: theme.spacing.unit * 2,
+      "& .titulo": {
+        flex: 1
+      }
+    },
     colEstado: {
       display: "flex",
       "& > div": {
@@ -128,6 +114,10 @@ const styles = theme => {
     },
     contenedorFiltroEstado: {
       display: "flex"
+    },
+    cardInfoFiltroDia: {
+      marginTop: theme.spacing.unit * 2,
+      backgroundColor: yellow["50"]
     }
   };
 };

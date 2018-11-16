@@ -68,8 +68,13 @@
 .customDate.hoy {
   background-color: white;
 }
+
 .customDate.hoy label {
   color: #149257;
+}
+
+.customdate.hoy.conTurnos {
+  background-color: #149257 !important;
 }
 
 .customDate.seleccionado {

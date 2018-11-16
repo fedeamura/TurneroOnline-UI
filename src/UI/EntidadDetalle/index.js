@@ -11,11 +11,20 @@ import { withRouter } from "react-router-dom";
 
 //REDUX
 import { connect } from "react-redux";
-import { goBack, push } from "connected-react-router";
-import { cerrarSesion } from "@Redux/Actions/usuario";
+import { push } from "connected-react-router";
+import { setEntidades } from "@Redux/Actions/entidades";
+import { toggleDrawer } from "@Redux/Actions/drawer";
 
 //Componentes
-import { Grid, Typography, Button } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+import List from "@material-ui/core/List";
+import Divider from "@material-ui/core/Divider";
+import ListSubheader from "@material-ui/core/ListSubheader";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -23,30 +32,29 @@ import FormControl from "@material-ui/core/FormControl";
 import _ from "lodash";
 
 //Mis componentes
-import MiContent from "@Componentes/MiContent";
-import MiPagina from "@Componentes/MiPagina";
 import MiCard from "@Componentes/MiCard";
-
-//Recursos
-import ToolbarLogo from "@Resources/imagenes/escudo_muni_texto_verde.png";
-import ToolbarLogo_Chico from "@Resources/imagenes/escudo_muni_verde.png";
+import _MiPagina from "../_MiPagina";
 
 //Rules
 import Rules_Entidad from "@Rules/Rules_Entidad";
 
 const mapStateToProps = state => {
-  return { token: state.Usuario.token };
+  return {
+    token: state.Usuario.token,
+    entidades: state.Entidades.entidades,
+    drawerOpen: state.Drawer.open
+  };
 };
 
 const mapDispatchToProps = dispatch => ({
-  goBack: () => {
-    dispatch(goBack());
-  },
-  redirigir: url => {
+  redireccionar: url => {
     dispatch(push(url));
   },
-  cerrarSesion: () => {
-    dispatch(cerrarSesion());
+  setEntidades: entidades => {
+    dispatch(setEntidades(entidades));
+  },
+  toggleDrawer: () => {
+    dispatch(toggleDrawer());
   }
 });
 
@@ -65,8 +73,12 @@ class EntidadDetalle extends React.Component {
   }
 
   componentDidMount() {
+    this.buscarDatos();
+  }
+
+  buscarDatos() {
     this.setState({ cargando: true }, () => {
-      Rules_Entidad.getDetalle(this.state.id)
+      Rules_Entidad.getDetalle(this.props.match.params.id)
         .then(data => {
           let turneroSeleccionadoEnTramite = {};
           _.each(data.tramites, tramite => {
@@ -87,6 +99,14 @@ class EntidadDetalle extends React.Component {
     });
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.match.params.id != nextProps.match.params.id) {
+      this.setState({ id: nextProps.match.params.id }, () => {
+        this.buscarDatos();
+      });
+    }
+  }
+
   onTurneroChange = e => {
     let turnero = _.find(this.state.data.tramites, item => {
       return (
@@ -104,21 +124,44 @@ class EntidadDetalle extends React.Component {
   onBotonTurneroDetalleClick = e => {
     let idTramite = e.currentTarget.attributes.itemprop.value;
     let idTurnero = this.state.turneroSeleccionadoEnTramite[idTramite];
-    this.props.redirigir("/TurneroDetalle/" + idTurnero);
+    this.props.redireccionar("/TurneroDetalle/" + idTurnero);
   };
 
   onBotonTurneroCalendarioClick = e => {
     let idTramite = e.currentTarget.attributes.itemprop.value;
     let idTurnero = this.state.turneroSeleccionadoEnTramite[idTramite];
-    this.props.redirigir("/TurneroCalendario/" + idTurnero);
+    this.props.redireccionar("/TurneroCalendario/" + idTurnero);
   };
 
-  onCerrarSesionClick = () => {
-    this.props.cerrarSesion();
+  onBotonInicioClick = () => {
+    const { width } = this.props;
+    let isMobile = !isWidthUp("md", width);
+    if (isMobile && this.props.drawerOpen === true) {
+      this.props.toggleDrawer();
+    }
+
+    this.props.redireccionar("/");
   };
 
-  onMiPerfilClick = () => {
-    window.location.href = window.Config.URL_MI_PERFIL + "/#/?token=" + this.props.token;
+  onBotonMisTurnosClick = () => {
+    const { width } = this.props;
+    let isMobile = !isWidthUp("md", width);
+    if (isMobile && this.props.drawerOpen === true) {
+      this.props.toggleDrawer();
+    }
+
+    this.props.redireccionar("/MisReservas");
+  };
+
+  onBotonMenuEntidadClick = e => {
+    const { width } = this.props;
+    let isMobile = !isWidthUp("md", width);
+    if (isMobile && this.props.drawerOpen === true) {
+      this.props.toggleDrawer();
+    }
+
+    let id = e.currentTarget.attributes.identidad.value;
+    this.props.redireccionar("/Entidad/" + id);
   };
 
   render() {
@@ -126,127 +169,152 @@ class EntidadDetalle extends React.Component {
 
     return (
       <React.Fragment>
-        <MiPagina
+        <_MiPagina
           cargando={this.state.cargando}
-          toolbarTitulo="Turnero online"
-          toolbarClassName={classes.toolbar}
-          toolbarRenderLogo={this.renderToolbarLogo()}
-          toolbarLeftIcon="arrow_back"
-          toolbarLeftIconClick={this.props.goBack}
-          onToolbarTituloClick={this.onToolbarTituloClick}
-          onToolbarMiPerfilClick={this.onMiPerfilClick}
-          onToolbarCerrarSesionClick={this.onCerrarSesionClick}
+          toolbarLeftIconClick={this.props.toggleDrawer}
+          toolbarLeftIcon="menu"
+          contentClassName={classNames(classes.contentClassName, this.props.drawerOpen && "drawerVisible")}
         >
-          <MiContent contentClassNames={classes.contentClassNames}>
+          <React.Fragment>
+            {this.renderDrawer()}
+
             {this.state.data != undefined && (
-              <div className={classNames(classes.card, this.state.cardVisible && "visible")}>
-                <MiCard>
-                  <Grid container spacing={32} direction="row-reverse">
-                    {/* Datos de la entidad */}
-                    <Grid item xs={12} sm={4}>
-                      {/* Imagen */}
-                      <div className={classes.imagenEntidad} style={{ backgroundImage: "url(" + this.state.data.urlImagen + ")" }} />
+              <MiCard>
+                <Grid container spacing={32} direction="row-reverse">
+                  {/* Datos de la entidad */}
+                  <Grid item xs={12} sm={4}>
+                    {/* Imagen */}
+                    <div className={classes.imagenEntidad} style={{ backgroundImage: "url(" + this.state.data.urlImagen + ")" }} />
 
-                      {/* Descripcion  */}
-                      <Typography variant="body1">{this.state.data.descripcion}</Typography>
+                    {/* Descripcion  */}
+                    <Typography variant="body1">{this.state.data.descripcion}</Typography>
 
-                      {/* Links */}
-                      {this.state.data.links != undefined && this.state.data.links.length != 0 && (
-                        <div className={classes.contenedorLinksInteres}>
-                          <Typography variant="body2">Links de interés</Typography>
-                          {this.state.data.links.map((item, index) => {
-                            return (
-                              <Typography
-                                key={index}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                href={item.url}
-                                component="a"
-                                className={classes.linkInteres}
-                              >
-                                {item.alias}
-                              </Typography>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </Grid>
-
-                    {/* COntenido principal */}
-                    <Grid item xs={12} sm={8}>
-                      <Typography variant="display1">Tramites disponibles para {this.state.data.nombre}</Typography>
-
-                      {/* Tramites */}
-                      {this.state.data.tramites == undefined ||
-                        (this.state.data.tramites.length == 0 && <Typography variant="body1">No hay trámites disponibles</Typography>)}
-
-                      {this.state.data.tramites != undefined && this.state.data.tramites.length != 0 && (
-                        <div className={classes.contenedorTramites}>
-                          {this.state.data.tramites.map((tramite, index) => {
-                            return (
-                              <div className={classes.contenedorTramite} key={index}>
-                                <Typography variant="headline">{tramite.nombre}</Typography>
-                                <Typography variant="body1">{tramite.descripcion}</Typography>
-
-                                {/* Turneros */}
-                                <FormControl
-                                  component="fieldset"
-                                  className={classes.formControl}
-                                  // style={{ display: tramite.turneros.length == 1 ? "none" : "auto" }}
-                                >
-                                  <RadioGroup
-                                    aria-label="Turnero"
-                                    name={"turnero" + tramite.id}
-                                    className={classes.group}
-                                    value={"" + this.state.turneroSeleccionadoEnTramite[tramite.id]}
-                                    onChange={this.onTurneroChange}
-                                  >
-                                    {tramite.turneros.map((turnero, index) => {
-                                      return (
-                                        <FormControlLabel key={index} value={"" + turnero.id} control={<Radio />} label={turnero.nombre} />
-                                      );
-                                    })}
-                                  </RadioGroup>
-                                </FormControl>
-
-                                <div className={classes.contenedorBotonesTramite}>
-                                  <Button
-                                    itemProp={tramite.id}
-                                    color="primary"
-                                    variant="outlined"
-                                    onClick={this.onBotonTurneroDetalleClick}
-                                  >
-                                    Más información
-                                  </Button>
-                                  <Button
-                                    itemProp={tramite.id}
-                                    color="primary"
-                                    variant="raised"
-                                    onClick={this.onBotonTurneroCalendarioClick}
-                                  >
-                                    Reservar turno
-                                  </Button>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </Grid>
+                    {/* Links */}
+                    {this.state.data.links != undefined && this.state.data.links.length != 0 && (
+                      <div className={classes.contenedorLinksInteres}>
+                        <Typography variant="body2">Links de interés</Typography>
+                        {this.state.data.links.map((item, index) => {
+                          return (
+                            <Typography
+                              key={index}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href={item.url}
+                              component="a"
+                              className={classes.linkInteres}
+                            >
+                              {item.alias}
+                            </Typography>
+                          );
+                        })}
+                      </div>
+                    )}
                   </Grid>
-                </MiCard>
-              </div>
+
+                  {/* COntenido principal */}
+                  <Grid item xs={12} sm={8}>
+                    <Typography variant="display1">Tramites disponibles para {this.state.data.nombre}</Typography>
+
+                    {/* Tramites */}
+                    {this.state.data.tramites == undefined ||
+                      (this.state.data.tramites.length == 0 && <Typography variant="body1">No hay trámites disponibles</Typography>)}
+
+                    {this.state.data.tramites != undefined && this.state.data.tramites.length != 0 && (
+                      <div className={classes.contenedorTramites}>
+                        {this.state.data.tramites.map((tramite, index) => {
+                          return (
+                            <div className={classes.contenedorTramite} key={index}>
+                              <Typography variant="headline">{tramite.nombre}</Typography>
+                              <Typography variant="body1">{tramite.descripcion}</Typography>
+
+                              {/* Turneros */}
+                              <FormControl
+                                component="fieldset"
+                                className={classes.formControl}
+                                // style={{ display: tramite.turneros.length == 1 ? "none" : "auto" }}
+                              >
+                                <RadioGroup
+                                  aria-label="Turnero"
+                                  name={"turnero" + tramite.id}
+                                  className={classes.group}
+                                  value={"" + this.state.turneroSeleccionadoEnTramite[tramite.id]}
+                                  onChange={this.onTurneroChange}
+                                >
+                                  {tramite.turneros.map((turnero, index) => {
+                                    return (
+                                      <FormControlLabel key={index} value={"" + turnero.id} control={<Radio />} label={turnero.nombre} />
+                                    );
+                                  })}
+                                </RadioGroup>
+                              </FormControl>
+
+                              <div className={classes.contenedorBotonesTramite}>
+                                <Button itemProp={tramite.id} color="primary" variant="outlined" onClick={this.onBotonTurneroDetalleClick}>
+                                  Más información
+                                </Button>
+                                <Button itemProp={tramite.id} color="primary" variant="raised" onClick={this.onBotonTurneroCalendarioClick}>
+                                  Reservar turno
+                                </Button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </Grid>
+                </Grid>
+              </MiCard>
             )}
-          </MiContent>
-        </MiPagina>
+          </React.Fragment>
+        </_MiPagina>
       </React.Fragment>
     );
   }
 
-  renderToolbarLogo() {
+  renderDrawer() {
     const { classes, width } = this.props;
-    let url = isWidthUp("md", width) ? ToolbarLogo : ToolbarLogo_Chico;
-    return <div className={classes.logoMuni} style={{ backgroundImage: "url(" + url + ")" }} />;
+    let isMobile = !isWidthUp("md", width);
+
+    return (
+      <SwipeableDrawer
+        classes={{ paper: classes.drawer }}
+        variant={isMobile ? "temporary" : "persistent"}
+        open={this.props.drawerOpen}
+        onClose={this.props.toggleDrawer}
+        onOpen={this.props.toggleDrawer}
+      >
+        <List>
+          <ListItem button className="item" onClick={this.onBotonInicioClick}>
+            <ListItemText primary="Inicio" />
+          </ListItem>
+          <ListItem button className="item" onClick={this.onBotonMisTurnosClick}>
+            <ListItemText primary="Mis turnos" />
+          </ListItem>
+
+          <Divider />
+        </List>
+        <List subheader={<ListSubheader component="div">Nuevo turno</ListSubheader>}>
+          {this.props.entidades.map(itemMenu => {
+            let seleccionado = this.props.match.params.id == itemMenu.id;
+            return (
+              <ListItem
+                identidad={itemMenu.id}
+                button
+                key={itemMenu.id}
+                className="item"
+                // selected={seleccionado}
+                style={{
+                  backgroundColor: seleccionado ? "rgba(0,0,0,0.1)" : "transparent"
+                }}
+                onClick={this.onBotonMenuEntidadClick}
+              >
+                <ListItemText primary={itemMenu.nombre} />
+              </ListItem>
+            );
+          })}
+        </List>
+      </SwipeableDrawer>
+    );
   }
 }
 

@@ -18,10 +18,9 @@ import { cerrarSesion } from "@Redux/Actions/usuario";
 import { Grid, Button } from "@material-ui/core";
 
 //Mis componentes
-import MiContent from "@Componentes/MiContent";
-import MiPagina from "@Componentes/MiPagina";
 import MiCard from "@Componentes/MiCard";
 import PanelTurneroDetalle from "./PanelTurneroDetalle";
+import _MiPagina from "../_MiPagina";
 
 //Recursos
 import ToolbarLogo from "@Resources/imagenes/escudo_muni_texto_verde.png";
@@ -96,18 +95,8 @@ class TurneroDetalle extends React.Component {
 
     return (
       <React.Fragment>
-        <MiPagina
-          cargando={this.state.cargando}
-          toolbarTitulo="Turnero online"
-          toolbarClassName={classes.toolbar}
-          toolbarRenderLogo={this.renderToolbarLogo()}
-          toolbarLeftIcon="arrow_back"
-          toolbarLeftIconClick={this.props.goBack}
-          onToolbarTituloClick={this.onToolbarTituloClick}
-          onToolbarMiPerfilClick={this.onMiPerfilClick}
-          onToolbarCerrarSesionClick={this.onCerrarSesionClick}
-        >
-          <MiContent contentClassNames={classes.contentClassNames}>
+        <_MiPagina cargando={this.state.cargando} toolbarTitulo="Turnero online" onToolbarTituloClick={this.onToolbarTituloClick}>
+          <React.Fragment>
             {this.state.data != undefined && (
               <div className={classNames(classes.card, this.state.cardVisible && "visible")}>
                 <MiCard>
@@ -128,8 +117,8 @@ class TurneroDetalle extends React.Component {
                 </MiCard>
               </div>
             )}
-          </MiContent>
-        </MiPagina>
+          </React.Fragment>
+        </_MiPagina>
       </React.Fragment>
     );
   }

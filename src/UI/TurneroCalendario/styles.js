@@ -2,24 +2,23 @@ import orange from "@material-ui/core/colors/orange";
 
 const styles = theme => {
   return {
-    paginaContent: {
+    contentClassName: {
       overflow: "auto",
       [theme.breakpoints.up("md")]: {
         overflow: "hidden"
       }
     },
-    rootClassNames: {
+    miContentRootClassName: {
       [theme.breakpoints.up("md")]: {
         height: "100%"
       }
     },
-    contentClassNames: {
-      display: "flex",
-      flexDirection: "column",
-      height: "100%"
-    },
-    grid: {
-      
+    miContentContentClassName: {
+      [theme.breakpoints.up("md")]: {
+        display: "flex",
+        flexDirection: "column",
+        height: "100%"
+      }
     },
     toolbar: {
       backgroundColor: "white",
@@ -112,6 +111,7 @@ const styles = theme => {
     },
     contenedorCalendarioRoot: {
       // height: "100%",
+      width: "100%",
       display: "flex",
       opacity: 0,
       transform: "translateY(50px)",
@@ -124,6 +124,8 @@ const styles = theme => {
       }
     },
     contenedorCalendarioDia: {
+      width: "100%",
+
       // height: "100%",
       "& > div": {
         display: "flex",
@@ -140,8 +142,15 @@ const styles = theme => {
     },
     colCalendario: {
       paddingRight: 0,
+      marginBottom: theme.spacing.unit * 4,
       [theme.breakpoints.up("md")]: {
-        paddingRight: theme.spacing.unit * 4
+        paddingRight: theme.spacing.unit * 4,
+        marginBottom: 0
+      },
+      opacity: 0,
+      transition: "all 0.3s",
+      "&.visible": {
+        opacity: 1
       }
     },
     colCalendarioDia: {

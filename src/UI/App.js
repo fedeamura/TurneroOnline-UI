@@ -16,6 +16,7 @@ import { connect } from "react-redux";
 import { ocultarAlerta } from "@Redux/Actions/alerta";
 import { login, cerrarSesion } from "@Redux/Actions/usuario";
 import { push, replace } from "connected-react-router";
+import { setEntidades } from "@Redux/Actions/entidades";
 
 //Componentes
 import Snackbar from "@material-ui/core/Snackbar";
@@ -34,6 +35,7 @@ import ReservasTurnosDeUsuario from "@UI/ReservasTurnoDeUsuario";
 
 //Mis rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
+import Rules_Entidad from "@Rules/Rules_Entidad";
 
 const theme = createMuiTheme({
   palette: {
@@ -72,6 +74,9 @@ const mapDispatchToProps = dispatch => ({
   },
   replace: url => {
     dispatch(replace(url));
+  },
+  setEntidades: entidades => {
+    dispatch(setEntidades(entidades));
   }
 });
 
@@ -147,9 +152,18 @@ class App extends React.Component {
               if (search) {
                 let url = search.get("url") || "/";
                 this.props.redireccionar(url);
-
               }
               this.onLogin();
+
+              Rules_Entidad.get()
+                .then(dataEntidad => {
+                  this.props.setEntidades(dataEntidad);
+                  this.setState({ validandoToken: false });
+                })
+                .catch(error => {
+                  this.props.cerrarSesion();
+                  window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+                });
             })
             .catch(() => {
               this.props.cerrarSesion();
@@ -159,9 +173,6 @@ class App extends React.Component {
         .catch(error => {
           this.props.cerrarSesion();
           window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
-        })
-        .finally(() => {
-          this.setState({ validandoToken: false });
         });
     });
   }
@@ -226,6 +237,8 @@ class App extends React.Component {
           <Route exact path={`${base}/TurneroCalendario/:id`} component={login ? TurneroCalendario : null} />
           <Route exact path={`${base}/Reserva/:id`} component={login ? ReservaTurnoDetalle : null} />
           <Route exact path={`${base}/MisReservas`} component={login ? ReservasTurnosDeUsuario : null} />
+          <Route exact path={`${base}/MisReservas/:estado`} component={login ? ReservasTurnosDeUsuario : null} />
+
           <Route component={Pagina404} />
         </AnimatedSwitch>
       </main>

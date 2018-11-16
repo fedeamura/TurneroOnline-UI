@@ -1,48 +1,24 @@
 const styles = theme => {
   return {
-    toolbar: {
-      backgroundColor: "white",
-      "& h2": {
-        color: "black"
-      },
-      "& h3": {
-        color: "black"
+    contentClassName: {
+      transition: "all 0.3s",
+      "&.drawerVisible": {
+        [theme.breakpoints.up("md")]: {
+          paddingLeft: "300px"
+        }
       }
     },
-    logoMuni: {
-      marginRight: "8px",
-      backgroundPosition: "center",
-      minWidth: "40px",
-      maxWidth: "40px",
-      minHeight: "40px",
-      maxHeight: "40px",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "contain",
+    drawer: {
+      backgroundColor: "white",
+      border: "none",
+      width: "300px",
       [theme.breakpoints.up("md")]: {
-        marginRight: "16px",
-        flexDirection: "row",
-        minWidth: "126px",
-        maxWidth: "126px"
-      }
-    },
-    contentClassNames: {
-      display: "flex",
-      flexDirection: "column",
-    
-    },
-    switchWrapper: {
-      backgroundColor: theme.palette.background.default,
-      position: "relative",
-      width: "100%",
-      flex: 1
-    },
-    toolbar: {
-      backgroundColor: "white",
-      "& h2": {
-        color: "black"
-      },
-      "& h3": {
-        color: "black"
+        paddingTop: "70px",
+        backgroundColor: "transparent",
+        "& .item": {
+          borderTopRightRadius: "32px",
+          borderBottomRightRadius: "32px"
+        }
       }
     },
     cardMisTurnos: {
@@ -54,6 +30,36 @@ const styles = theme => {
         pointerEvents: "all",
         opacity: 1,
         transform: "translateY(0px)"
+      }
+    },
+    contenedorContadores: {
+      display: "flex",
+      flexWrap: "wrap"
+    },
+    contadorTurno: {
+      margin: theme.spacing.unit,
+      cursor: "pointer",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "all 0.3s",
+      "&:hover": {
+        opacity: 0.7
+      },
+      "& > div": {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "48px",
+        height: "48px",
+        borderRadius: "72px",
+        color: "white",
+        marginBottom: theme.spacing.unit,
+        "& *": {
+          color: "white"
+        }
       }
     },
     misTurnosContenedorBotones: {

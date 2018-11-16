@@ -1,33 +1,24 @@
 const styles = theme => {
   return {
-    contentClassNames: {
-      display: "flex",
-      flexDirection: "column"
+    contentClassName: {
+      transition: "all 0.3s",
+      "&.drawerVisible": {
+        [theme.breakpoints.up("md")]: {
+          paddingLeft: "300px"
+        }
+      }
     },
-    toolbar: {
+    drawer: {
       backgroundColor: "white",
-      "& h2": {
-        color: "black"
-      },
-      "& h3": {
-        color: "black"
-      },
-      color: "black"
-    },
-    logoMuni: {
-      marginRight: "8px",
-      backgroundPosition: "center",
-      minWidth: "40px",
-      maxWidth: "40px",
-      minHeight: "40px",
-      maxHeight: "40px",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "contain",
+      border: "none",
+      width: "300px",
       [theme.breakpoints.up("md")]: {
-        marginRight: "16px",
-        flexDirection: "row",
-        minWidth: "126px",
-        maxWidth: "126px"
+        paddingTop: "70px",
+        backgroundColor: "transparent",
+        "& .item": {
+          borderTopRightRadius: "32px",
+          borderBottomRightRadius: "32px"
+        }
       }
     },
     card: {

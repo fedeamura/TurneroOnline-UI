@@ -23,17 +23,12 @@ import DialogContent from "@material-ui/core/DialogContent";
 import red from "@material-ui/core/colors/red";
 
 //Mis componentes
-import MiContent from "@Componentes/MiContent";
-import MiPagina from "@Componentes/MiPagina";
+import _MiPagina from "../_MiPagina";
 import MiCard from "@Componentes/MiCard";
 import MiBaner from "@Componentes/MiBaner";
 
 import TurnoPendiente from "../Inicio/TurnoPendiente";
 import PanelTurneroDetalle from "../TurneroDetalle/PanelTurneroDetalle";
-
-//Recursos
-import ToolbarLogo from "@Resources/imagenes/escudo_muni_texto_verde.png";
-import ToolbarLogo_Chico from "@Resources/imagenes/escudo_muni_verde.png";
 
 //Rules
 import Rules_Turnero from "@Rules/Rules_Turnero";
@@ -170,46 +165,36 @@ class ReservaDetalle extends React.Component {
 
     return (
       <React.Fragment>
-        <MiPagina
-          cargando={this.state.cargando}
-          toolbarTitulo="Turnero online"
-          toolbarClassName={classes.toolbar}
-          toolbarRenderLogo={this.renderToolbarLogo}
-          toolbarLeftIcon="arrow_back"
-          toolbarLeftIconClick={this.props.goBack}
-          contentClassName={classes.paginaContent}
-        >
-          <MiContent className={classes.content}>
-            <MiCard padding={false} titulo="Datos del turno" rootClassName={classNames(classes.card, this.state.cardVisible && "visible")}>
-              <MiBaner modo="error" visible={this.state.mostrarError} mensaje={this.state.error} onClose={this.onBotonOcultarErrorClick} />
-              {this.state.dataTurno && (
-                <div style={{ padding: "16px" }}>
-                  <TurnoPendiente data={this.state.dataTurno} />
+        <_MiPagina cargando={this.state.cargando}>
+          <MiCard padding={false} titulo="Datos del turno" rootClassName={classNames(classes.card, this.state.cardVisible && "visible")}>
+            <MiBaner modo="error" visible={this.state.mostrarError} mensaje={this.state.error} onClose={this.onBotonOcultarErrorClick} />
+            {this.state.dataTurno && (
+              <div style={{ padding: "16px" }}>
+                <TurnoPendiente data={this.state.dataTurno} />
 
-                  {this.state.dataTurno.estadoKeyValue == 1 && (
-                    <div className={classes.contenedorBotones}>
-                      <Button
-                        variant="outlined"
-                        style={{ color: red["500"], borderColor: red["500"] }}
-                        onClick={this.onBotonCancelarTurnoClick}
-                      >
-                        Anular turno
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              )}
-              {this.state.dataTurnero && (
-                <React.Fragment>
-                  <div style={{ backgroundColor: "rgba(0,0,0,0.1)", height: "1px" }} />
-                  <div style={{ padding: "16px" }}>
-                    <PanelTurneroDetalle data={this.state.dataTurnero} />
+                {this.state.dataTurno.estadoKeyValue == 1 && (
+                  <div className={classes.contenedorBotones}>
+                    <Button
+                      variant="outlined"
+                      style={{ color: red["500"], borderColor: red["500"] }}
+                      onClick={this.onBotonCancelarTurnoClick}
+                    >
+                      Anular turno
+                    </Button>
                   </div>
-                </React.Fragment>
-              )}
-            </MiCard>
-          </MiContent>
-        </MiPagina>
+                )}
+              </div>
+            )}
+            {this.state.dataTurnero && (
+              <React.Fragment>
+                <div style={{ backgroundColor: "rgba(0,0,0,0.1)", height: "1px" }} />
+                <div style={{ padding: "16px" }}>
+                  <PanelTurneroDetalle data={this.state.dataTurnero} />
+                </div>
+              </React.Fragment>
+            )}
+          </MiCard>
+        </_MiPagina>
 
         {this.renderDialogoConfirmarCancelarTurno()}
       </React.Fragment>
@@ -231,12 +216,6 @@ class ReservaDetalle extends React.Component {
       </Dialog>
     );
   }
-
-  renderToolbarLogo = () => {
-    const { classes } = this.props;
-
-    return <div className={classes.logoMuni} style={{ backgroundImage: "url(" + ToolbarLogo + ")" }} />;
-  };
 }
 
 let componente = ReservaDetalle;

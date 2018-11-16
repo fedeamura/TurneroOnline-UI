@@ -6,8 +6,11 @@ export const USUARIO_CERRAR_SESION = "USUARIO_CERRAR_SESION";
 export const ALERTA_SHOW = "ALERTA_SHOW";
 export const ALERTA_HIDE = "ALERTA_HIDE";
 
-//MAIN CONTENT
-export const MAIN_CONTENT_CARGANDO = "MAIN_CONTENT_CARGANDO";
-
 //Notificaciones
 export const NOTIFICACIONES_SET = "NOTIFICACIONES_SET";
+
+//Entidades
+export const ENTIDADES_SET = "ENTIDADES_SET";
+
+//Drawer
+export const DRAWER_TOGGLE = "TOGGLE_DRAWER";
