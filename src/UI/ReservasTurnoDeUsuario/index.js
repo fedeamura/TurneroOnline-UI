@@ -94,6 +94,10 @@ class TurnosDeUsuario extends React.Component {
                 }
               }
 
+              data.forEach(item => {
+                item.fechaDate = DateUtils.toDateTime(item.fecha);
+              });
+
               this.setState({
                 data: data,
                 cardVisible: true,
@@ -190,6 +194,7 @@ class TurnosDeUsuario extends React.Component {
 
       conFiltroEstados =
         filtroEstados.length != 0 && filtroEstados.length != this.state.estadosReservaTurno.length + 1 && filtroEstados.length != 0;
+
       tieneFiltros = this.state.diaSeleccionado != undefined || conFiltroEstados;
     }
 
@@ -203,6 +208,7 @@ class TurnosDeUsuario extends React.Component {
             views={{ month: true }}
             culture="es"
             localizer={localizer}
+            onView={() => {}}
             onDrillDown={this.onDiaClick}
             events={[]}
             startAccessor="start"
@@ -331,23 +337,23 @@ class TurnosDeUsuario extends React.Component {
         check={false}
         rowType={"Turnos"}
         columns={[
-          { id: "codigo", type: "string", numeric: false, label: "Código" },
-          // { id: "entidadNombre", type: "string", numeric: false, label: "Tipo" },
-          { id: "tramiteNombre", type: "string", numeric: false, label: "Trámite" },
-          { id: "fecha", type: "datetime", numeric: false, label: "Fecha" },
-          { id: "estadoNombre", type: "string", numeric: false, label: "Estado" },
-          { id: "botones", type: "string", numeric: false, label: "" }
+          { id: "codigo", label: "Código", orderBy: this.orderColumnaCodigo },
+          { id: "tramiteNombre", label: "Trámite" },
+          { id: "fecha", label: "Fecha", orderBy: this.orderColumnaFecha },
+          { id: "estadoNombre", label: "Estado", orderBy: this.orderColumnaEstado },
+          { id: "botones", label: "" },
+          { id: "data", hidden: true }
         ]}
         rows={dataFiltrada.map(item => {
           let fecha = DateUtils.toDateTime(item.fecha);
 
           return {
             codigo: this.renderColumnaCodigo(item),
-            // entidadNombre: item.entidadNombre,
             tramiteNombre: item.tramiteNombre,
-            fecha: DateUtils.toDateTimeString(fecha),
+            fecha: this.renderColumnaFecha(item),
             estadoNombre: this.renderColumnaEstado(item),
-            botones: this.renderColumnaBotones(item)
+            botones: this.renderColumnaBotones(item),
+            data: item
           };
         })}
         orderBy={"fecha"}
@@ -355,9 +361,62 @@ class TurnosDeUsuario extends React.Component {
     );
   }
 
-  renderColumnaCodigo(data) {
-    const { classes } = this.props;
+  orderColumnaCodigo(dataA, dataB) {
+    dataA = dataA.data;
+    dataB = dataB.data;
 
+    let codigoA = `${dataA.codigo}/${dataA.año}`;
+    let codigoB = `${dataB.codigo}/${dataB.año}`;
+
+    if (codigoA < codigoB) {
+      return 1;
+    }
+
+    if (codigoA > codigoB) {
+      return -1;
+    }
+
+    return 0;
+  }
+
+  orderColumnaFecha(dataA, dataB) {
+    dataA = dataA.data.fechaDate;
+    dataB = dataB.data.fechaDate;
+
+    if (dataA < dataB) {
+      return 1;
+    }
+
+    if (dataA > dataB) {
+      return -1;
+    }
+
+    return 0;
+  }
+
+  renderColumnaFecha(data) {
+    return <Typography variant="body1">{DateUtils.toDateTimeString(data.fechaDate)}</Typography>;
+  }
+
+  orderColumnaEstado(dataA, dataB) {
+    dataA = dataA.data;
+    dataB = dataB.data;
+
+    let codigoA = `${dataA.estadoNombre}`;
+    let codigoB = `${dataB.estadoNombre}`;
+
+    if (codigoA < codigoB) {
+      return 1;
+    }
+
+    if (codigoA > codigoB) {
+      return -1;
+    }
+
+    return 0;
+  }
+
+  renderColumnaCodigo(data) {
     return (
       <Typography
         onClick={() => {
@@ -369,14 +428,27 @@ class TurnosDeUsuario extends React.Component {
       >{`${data.codigo}/${data.año}`}</Typography>
     );
   }
-
   renderColumnaEstado(data) {
     const { classes } = this.props;
 
     return (
       <div className={classes.colEstado}>
         <div className={classes.indicadorEstado} style={{ backgroundColor: data.estadoColor }} />
-        <Typography>{data.estadoNombre}</Typography>
+        <Typography variant="body1">{data.estadoNombre}</Typography>
+      </div>
+    );
+  }
+
+  renderColumnaBotones(data) {
+    return (
+      <div>
+        <IconButton
+          onClick={() => {
+            this.props.redirigir("/Reserva/" + data.id);
+          }}
+        >
+          <Icon>info</Icon>
+        </IconButton>
       </div>
     );
   }
@@ -416,9 +488,8 @@ class TurnosDeUsuario extends React.Component {
 
           {this.state.estadosReservaTurno.map((item, index) => {
             return (
-              <div className={classes.contenedorFiltroEstado}>
+              <div className={classes.contenedorFiltroEstado} key={index}>
                 <FormControlLabel
-                  key={index}
                   control={
                     <div style={{ display: "flex", alignItems: "center", marginRight: "8px" }}>
                       <Checkbox
@@ -438,20 +509,6 @@ class TurnosDeUsuario extends React.Component {
             );
           })}
         </div>
-      </div>
-    );
-  }
-
-  renderColumnaBotones(data) {
-    return (
-      <div>
-        <IconButton
-          onClick={() => {
-            this.props.redirigir("/Reserva/" + data.id);
-          }}
-        >
-          <Icon>info</Icon>
-        </IconButton>
       </div>
     );
   }

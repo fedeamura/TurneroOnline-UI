@@ -77,7 +77,7 @@ class EntidadDetalle extends React.Component {
   }
 
   buscarDatos() {
-    this.setState({ cargando: true }, () => {
+    this.setState({ cargando: true, cardVisible: false }, () => {
       Rules_Entidad.getDetalle(this.props.match.params.id)
         .then(data => {
           let turneroSeleccionadoEnTramite = {};
@@ -179,7 +179,7 @@ class EntidadDetalle extends React.Component {
             {this.renderDrawer()}
 
             {this.state.data != undefined && (
-              <MiCard>
+              <MiCard rootClassName={classNames(classes.card, this.state.cardVisible && "visible")}>
                 <Grid container spacing={32} direction="row-reverse">
                   {/* Datos de la entidad */}
                   <Grid item xs={12} sm={4}>
@@ -213,7 +213,7 @@ class EntidadDetalle extends React.Component {
 
                   {/* COntenido principal */}
                   <Grid item xs={12} sm={8}>
-                    <Typography variant="display1">Tramites disponibles para {this.state.data.nombre}</Typography>
+                    <Typography variant="title">Tramites disponibles para {this.state.data.nombre}</Typography>
 
                     {/* Tramites */}
                     {this.state.data.tramites == undefined ||

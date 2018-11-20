@@ -148,7 +148,6 @@ class App extends React.Component {
                 token: token
               });
 
-              // let url = "/";
               if (search) {
                 let url = search.get("url") || "/";
                 this.props.redireccionar(url);

@@ -26,7 +26,8 @@ import Divider from "@material-ui/core/Divider";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
-import { Icon } from "@material-ui/core";
+import ButtonBase from "@material-ui/core/ButtonBase";
+import Icon from "@material-ui/core/Icon";
 
 //Mis Componentes
 import _MiPagina from "../_MiPagina";
@@ -292,9 +293,9 @@ class App extends React.Component {
                           estado={contador.estado.keyValue}
                           onClick={this.onBotonMisTurnosEstadoClick}
                         >
-                          <div style={{ backgroundColor: contador.estado.color }}>
+                          <ButtonBase className={"button"} style={{ backgroundColor: contador.estado.color }}>
                             <Typography variant="subheading">{contador.contador}</Typography>
-                          </div>
+                          </ButtonBase>
                           <Typography variant="body2">{contador.estado.nombre}</Typography>
                         </div>
                       );

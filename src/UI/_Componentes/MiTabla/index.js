@@ -4,7 +4,6 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { styles, toolbarStyles } from "./styles";
 import classNames from "classnames";
-import { connect } from "react-redux";
 
 import PropTypes from "prop-types";
 import Table from "@material-ui/core/Table";
@@ -14,8 +13,9 @@ import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
-import Paper from "@material-ui/core/Paper";
 import Checkbox from "@material-ui/core/Checkbox";
+import _ from "lodash";
+import { Typography } from "@material-ui/core";
 
 /*
 Props esperadas:
@@ -29,23 +29,33 @@ Props esperadas:
 ->noCheck - Boolean que determina si la grilla muestra los checks o no
 */
 
-const mapDispatchToProps = dispatch => ({});
+const desc = (a, b, orderBy, orderType, cols) => {
+  let col = _.find(cols, col => col.id == orderBy);
+  if (col) {
+    if ("orderBy" in col && col.orderBy != undefined) {
+      return col.orderBy(a, b);
+    }
+  }
 
-function desc(a, b, orderBy, orderType) {
   switch (orderType) {
     case "date": {
-      let dateA = a[orderBy].split("/");
-      let dateB = b[orderBy].split("/");
+      try {
+        let dateA = a[orderBy].split("/");
+        let dateB = b[orderBy].split("/");
 
-      dateB = new Date(dateB[1] + "/" + dateB[0] + "/" + dateB[2]);
-      dateA = new Date(dateA[1] + "/" + dateA[0] + "/" + dateA[2]);
-      if (dateB < dateA) {
-        return -1;
+        dateB = new Date(dateB[1] + "/" + dateB[0] + "/" + dateB[2]);
+        dateA = new Date(dateA[1] + "/" + dateA[0] + "/" + dateA[2]);
+        if (dateB < dateA) {
+          return -1;
+        }
+        if (dateB > dateA) {
+          return 1;
+        }
+        return 0;
+      } catch (ex) {
+        console.log(ex);
+        return 0;
       }
-      if (dateB > dateA) {
-        return 1;
-      }
-      return 0;
     }
 
     case "datetime": {
@@ -89,9 +99,9 @@ function desc(a, b, orderBy, orderType) {
       return 0;
     }
   }
-}
+};
 
-function stableSort(array, cmp) {
+const stableSort = (array, cmp) => {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
     const order = cmp(a[0], b[0]);
@@ -99,11 +109,11 @@ function stableSort(array, cmp) {
     return a[1] - b[1];
   });
   return stabilizedThis.map(el => el[0]);
-}
+};
 
-function getSorting(order, orderBy, orderType) {
-  return order === "desc" ? (a, b) => desc(a, b, orderBy, orderType) : (a, b) => -desc(a, b, orderBy, orderType);
-}
+const getSorting = (order, orderBy, orderType, columns) => {
+  return order === "desc" ? (a, b) => desc(a, b, orderBy, orderType, columns) : (a, b) => -desc(a, b, orderBy, orderType, columns);
+};
 
 class EnhancedTableHead extends React.Component {
   createSortHandler = (property, colType) => event => {
@@ -130,11 +140,12 @@ class EnhancedTableHead extends React.Component {
             </TableCell>
           )}
           {this.props.columns.map((row, key) => {
+            if (row.hidden === true) return null;
             return (
               <TableCell
                 className={classes.tableCell}
                 key={row.id}
-                numeric={row.numeric}
+                numeric={row.numeric || false}
                 padding={"dense"}
                 sortDirection={orderBy === row.id ? order : false}
               >
@@ -215,7 +226,7 @@ class MiTabla extends React.Component {
     let newSelected = [];
     if (event.target.checked) {
       newSelected = this.state.data.map(n => n.id);
-      this.setState(state => ({ selected: newSelected }));
+      this.setState({ selected: newSelected });
     } else {
       this.setState({ selected: newSelected });
     }
@@ -286,13 +297,14 @@ class MiTabla extends React.Component {
               check={check}
             />
             <TableBody>
-              {stableSort(data, getSorting(order, orderBy, orderType))
+              {stableSort(data, getSorting(order, orderBy, orderType, this.props.columns))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((n, index) => {
                   const isSelected = this.isSelected(n.id);
 
                   return (
                     <MiRow
+                      columns={this.props.columns}
                       key={index}
                       check={check}
                       data={n}
@@ -346,7 +358,7 @@ class MiRow extends React.PureComponent {
   render() {
     const check = this.props.check || false;
     const classes = this.props.classes;
-
+    const columns = this.props.columns;
     return (
       <TableRow
         hover
@@ -363,11 +375,17 @@ class MiRow extends React.PureComponent {
           </TableCell>
         )}
         {Object.keys(this.props.data).map((cell, key) => {
-          if (cell == "data") return; //'data' son datos extras para utilizar
+          const col = _.find(columns, col => {
+            return col.id == cell;
+          });
+          if (col) {
+            if (col.hidden === true) return null;
+          }
+
           return (
             cell != "id" && (
               <TableCell className={classes.tableCell} key={cell} padding="dense">
-                {this.props.data[cell]}
+                <Typography variant="body1">{this.props.data[cell]}</Typography>
               </TableCell>
             )
           );
@@ -381,7 +399,4 @@ MiTabla.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default connect(
-  null,
-  mapDispatchToProps
-)(withStyles(styles)(MiTabla));
+export default withStyles(styles)(MiTabla);

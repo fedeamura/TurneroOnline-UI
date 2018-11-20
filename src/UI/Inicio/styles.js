@@ -47,7 +47,7 @@ const styles = theme => {
       "&:hover": {
         opacity: 0.7
       },
-      "& > div": {
+      "& > .button": {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

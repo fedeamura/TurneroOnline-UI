@@ -17,13 +17,7 @@ class MiCard extends React.PureComponent {
     return (
       <div className={this.props.rootClassName}>
         {conTitulo && (
-          <Typography
-            className={classNames(
-              classes.titulo,
-              conMargin && classes.tituloMargin
-            )}
-            variant="headline"
-          >
+          <Typography className={classNames(classes.titulo, conMargin && classes.tituloMargin)} variant="headline">
             {titulo}
           </Typography>
         )}
@@ -38,14 +32,8 @@ class MiCard extends React.PureComponent {
           )}
           {...this.props.cardProps}
         >
-          <CardContent
-            className={classNames(
-              classes.content,
-              this.props.contentClassName,
-              sinPadding && classes.cardSinPadding
-            )}
-          >
-            {this.props.children}
+          <CardContent className={classNames(classes.content, this.props.contentClassName, sinPadding && classes.cardSinPadding)}>
+            {this.props.children != undefined && this.props.children}
           </CardContent>
         </Card>
       </div>
