@@ -4,13 +4,21 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import styles from "./styles";
+import Typography from "@material-ui/core/Typography";
+import Icon from "@material-ui/core/Icon";
 
 //Mis componentes
 import MiToolbar from "../MiToolbar";
 
 class MiPagina extends React.PureComponent {
+  onBreadcrumbClick = e => {
+    var url = e.currentTarget.attributes["data-url"].value;
+    if (url == "") return;
+    this.props.onBreadcrumbClick && this.props.onBreadcrumbClick(url);
+  };
+
   render() {
-    let { classes } = this.props;
+    let { classes, breadcrumbs } = this.props;
 
     return (
       <React.Fragment>
@@ -19,6 +27,7 @@ class MiPagina extends React.PureComponent {
             leftIconClick={this.props.toolbarLeftIconClick}
             leftIcon={this.props.toolbarLeftIcon}
             leftIconClassName={this.props.toolbarLeftIconClassName}
+            breadcrumbs={this.props.toolbarBreadcrumbs || []}
             cargando={this.props.cargando}
             className={this.props.toolbarClassName}
             renderLogo={this.props.toolbarRenderLogo}
@@ -35,6 +44,29 @@ class MiPagina extends React.PureComponent {
           {/* Contenido */}
           <div className={classes.main}>
             <div className={classes.separadorToolbar} />
+
+            {/* Breadcrumbs */}
+            {breadcrumbs && breadcrumbs.length != 0 && (
+              <div className={classes.contenedorBreadcrumbs}>
+                {breadcrumbs.map((bread, index) => {
+                  return (
+                    <div className="breadcrumb" data-url={bread.url || ""} onClick={this.onBreadcrumbClick}>
+                      <div className="textos">
+                        <Typography variant="body2" className="texto" noWrap>
+                          {bread.titulo}
+                        </Typography>
+                        <Typography variant="body1" className="texto" noWrap>
+                          {bread.texto}
+                        </Typography>
+                      </div>
+
+                      {index != breadcrumbs.length - 1 && <Icon className="icono">chevron_right</Icon>}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             <div className={classNames(classes.content, this.props.contentClassName)}>{this.props.children}</div>
           </div>
 

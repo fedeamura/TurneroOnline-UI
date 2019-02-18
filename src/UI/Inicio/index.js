@@ -358,7 +358,7 @@ class App extends React.Component {
 
           <Divider />
         </List>
-        <List subheader={<ListSubheader component="div">Nuevo turno</ListSubheader>}>
+        <List subheader={<ListSubheader component="div">Tramites disponibles</ListSubheader>}>
           {this.props.entidades.map((itemMenu, index) => {
             return (
               <ListItem identidad={itemMenu.id} button key={index} className="item" onClick={this.onBotonMenuEntidadClick}>

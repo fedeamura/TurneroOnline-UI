@@ -1,9 +1,11 @@
 import React from "react";
 
 //Styles
+import classNames from "classnames";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { withStyles } from "@material-ui/core/styles";
 import "./style.css";
+import styles from "./styles";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 
 //Router
@@ -17,11 +19,15 @@ import { ocultarAlerta } from "@Redux/Actions/alerta";
 import { login, cerrarSesion } from "@Redux/Actions/usuario";
 import { push, replace } from "connected-react-router";
 import { setEntidades } from "@Redux/Actions/entidades";
+import { setVisible } from "@Redux/Actions/general";
 
 //Componentes
 import Snackbar from "@material-ui/core/Snackbar";
 import SnackbarContent from "@material-ui/core/SnackbarContent";
-import { IconButton, Icon, Typography } from "@material-ui/core";
+import IconButton from "@material-ui/core/IconButton";
+import Icon from "@material-ui/core/Icon";
+import Typography from "@material-ui/core/Typography";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import CloseIcon from "@material-ui/icons/Close";
 
 //Mis componentes
@@ -55,7 +61,8 @@ const mapStateToProps = state => {
   return {
     token: state.Usuario.token,
     usuario: state.Usuario.usuario,
-    alertas: state.Alerta.alertas
+    alertas: state.Alerta.alertas,
+    visible: state.General.visible
   };
 };
 
@@ -77,6 +84,9 @@ const mapDispatchToProps = dispatch => ({
   },
   setEntidades: entidades => {
     dispatch(setEntidades(entidades));
+  },
+  setVisible: visible => {
+    dispatch(setVisible(visible));
   }
 });
 
@@ -90,12 +100,6 @@ Promise.prototype.finally = function(callback) {
   );
 };
 
-String.prototype.toTitleCase = function() {
-  return this.replace(/\w\S*/g, function(txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-  });
-};
-
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -105,15 +109,20 @@ class App extends React.Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.token != nextProps.token) {
-      if (nextProps.token === undefined) {
-        this.props.cerrarSesion();
-        window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
-      }
-    }
-  }
   componentDidMount() {
+    setTimeout(() => {
+      this.props.setVisible(true);
+      setTimeout(() => {
+        this.consultarLoginInicial();
+      }, 500);
+    }, 100);
+  }
+
+  componentWillUnmount() {
+    this.intervalo && clearInterval(this.intervalo);
+  }
+
+  consultarLoginInicial = () => {
     let token = localStorage.getItem("token");
 
     let search = this.props.location.search;
@@ -127,8 +136,7 @@ class App extends React.Component {
     }
 
     if (token == undefined || token == null || token == "undefined" || token == "") {
-      this.props.cerrarSesion();
-      window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+      this.cerrarSesion();
       return;
     }
 
@@ -136,8 +144,7 @@ class App extends React.Component {
       Rules_Usuario.validarToken(token)
         .then(resultado => {
           if (resultado == false) {
-            this.props.cerrarSesion();
-            window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+            this.cerrarSesion();
             return;
           }
 
@@ -159,61 +166,66 @@ class App extends React.Component {
                   this.props.setEntidades(dataEntidad);
                   this.setState({ validandoToken: false });
                 })
-                .catch(error => {
-                  this.props.cerrarSesion();
-                  window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+                .catch(() => {
+                  this.cerrarSesion();
                 });
             })
             .catch(() => {
-              this.props.cerrarSesion();
-              window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+              this.cerrarSesion();
             });
         })
-        .catch(error => {
-          this.props.cerrarSesion();
-          window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+        .catch(() => {
+          this.cerrarSesion();
         });
     });
-  }
+  };
 
   onLogin = () => {
     //Cada 5 seg valido el token
     this.intervalo = setInterval(() => {
       let token = localStorage.getItem("token");
       if (token == undefined || token == null || token == "undefined") {
-        this.props.cerrarSesion();
-        window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+        this.cerrarSesion();
         return;
       }
 
       Rules_Usuario.validarToken(token)
         .then(resultado => {
           if (resultado == false) {
-            this.props.cerrarSesion();
-            window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+            this.cerrarSesion();
             return;
           }
         })
-        .catch(error => {
-          this.props.cerrarSesion();
-          window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+        .catch(() => {
+          this.cerrarSesion();
         });
     }, 5000);
   };
 
-  componentWillUnmount() {
-    this.intervalo && clearInterval(this.intervalo);
-  }
+  cerrarSesion = () => {
+    this.props.setVisible(false);
+    setTimeout(() => {
+      this.props.cerrarSesion();
+      window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+    }, 500);
+  };
 
   render() {
     const { classes } = this.props;
 
+    const login = this.state.validandoToken == false && this.props.usuario != undefined;
+
     return (
       <MuiThemeProvider theme={theme}>
-        <div className={classes.root}>
+        <div className={classNames(classes.root, this.props.visible && "visible")}>
           <CssBaseline />
           {this.renderContent()}
           {this.renderAlertas()}
+
+          <div className={classNames(classes.contenedorCargandoLogin, login != true && "visible")}>
+            <CircularProgress style={{ marginBottom: 8 }} />
+            <Typography variant="subheading">Cargando...</Typography>
+          </div>
         </div>
       </MuiThemeProvider>
     );
@@ -294,32 +306,6 @@ class App extends React.Component {
     });
   }
 }
-
-const styles = theme => {
-  return {
-    root: {
-      display: "flex",
-      height: "100vh",
-      overflow: "hidden"
-    },
-    content: {
-      display: "flex",
-      flexGrow: 1,
-      overflow: "auto",
-      overflow: "hidden"
-    },
-    icon: {
-      fontSize: 20
-    },
-    snackCustomIcon: {
-      marginRight: theme.spacing.unit
-    },
-    snackMessage: {
-      display: "flex",
-      alignItems: "center"
-    }
-  };
-};
 
 let componente = App;
 componente = withStyles(styles)(componente);

@@ -51,10 +51,7 @@ const styles = theme => {
         fontWeight: "bold"
       }
     },
-    contenedorTramite: {
-      marginTop: "16px",
-      marginBottom: "32px"
-    },
+  
     contenedorBotonesTramite: {
       display: "flex",
       justifyContent: "flex-end",

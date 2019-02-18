@@ -27,7 +27,7 @@ class PanelTurneroDetalle extends React.PureComponent {
         <Grid container spacing={32} direction="row">
           {/* COntenido principal */}
           <Grid item xs={12}>
-            <Typography variant="display1">{this.props.data.tramiteNombre}</Typography>
+            <Typography variant="title">Turnero: {this.props.data.nombre}</Typography>
             <Typography variant="body1">{this.props.data.descripcion}</Typography>
           </Grid>
 

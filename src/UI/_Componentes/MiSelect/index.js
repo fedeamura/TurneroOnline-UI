@@ -4,19 +4,23 @@ import classNames from "classnames";
 import styles from "./styles";
 import { withStyles } from "@material-ui/core/styles";
 
+import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import withMobileDialog from "@material-ui/core/withMobileDialog";
-import List from "@material-ui/core/List";
+// import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
-
-import TextField from "@material-ui/core/TextField";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
+import List from "react-virtualized/dist/commonjs/List";
 
 import _ from "lodash";
 import { Icon, Typography } from "@material-ui/core";
+
+import memoize from "memoize-one";
 
 class MiSelect extends React.Component {
   constructor(props) {
@@ -24,7 +28,11 @@ class MiSelect extends React.Component {
 
     this.state = {
       open: false,
-      busqueda: ""
+      busqueda: "",
+      listHeight: 300,
+      listRowHeight: 50,
+      overscanRowCount: 10,
+      rowCount: 0
     };
   }
 
@@ -38,6 +46,12 @@ class MiSelect extends React.Component {
   };
 
   onClick = value => {
+    if (value == -1) {
+      this.props.onChange && this.props.onChange(undefined);
+      this.onClose();
+      return;
+    }
+
     let item = _.find(this.props.options, opcion => {
       return opcion.value === value;
     });
@@ -68,81 +82,120 @@ class MiSelect extends React.Component {
       }
     }
   };
-  render() {
-    let { options, fullScreen, value } = this.props;
-    options = options || [];
 
-    if (
-      this.props.default &&
-      _.find(options, item => {
-        return item.value === this.props.default.value;
-      }) === undefined
-    ) {
-      options.unshift(this.props.default);
+  generarOpciones = memoize((opciones, placeholder) => {
+    if (placeholder) {
+      opciones = [
+        {
+          label: placeholder,
+          value: -1
+        },
+        ...opciones
+      ];
     }
 
-    let opcionSeleccionada = undefined;
-    if (value) {
-      opcionSeleccionada = _.find(this.props.options, item => {
-        return item.value == value;
-      });
-    }
+    return [...opciones];
+  });
 
-    let opcionesFiltradas = _.filter(options, opcion => {
-      let busqueda = this.transformarTexto(this.state.busqueda);
+  findOpcionSeleccionada = memoize((data, id) => {
+    if (id == undefined || id == -1) return undefined;
+
+    return _.find(data, item => {
+      return item.value == id;
+    });
+  });
+
+  filtrarOpciones = memoize((opciones, filtro) => {
+    return _.filter(opciones, opcion => {
+      let busqueda = this.transformarTexto(filtro);
       let label = this.transformarTexto(opcion.label);
       return label.indexOf(busqueda) !== -1;
     });
+  });
+
+  onTextFieldRef = ref => {
+    this.ref = ref;
+  };
+
+  transformarTexto = txt => {
+    if (txt === undefined) return "";
+    txt = txt.toLowerCase();
+    txt = txt.replace(/á/g, "a");
+    txt = txt.replace(/é/g, "e");
+    txt = txt.replace(/í/g, "i");
+    txt = txt.replace(/ó/g, "o");
+    txt = txt.replace(/ú/g, "u");
+    return txt;
+  };
+
+  render() {
+    const { options, fullScreen, value, placeholder } = this.props;
+    const { busqueda } = this.state;
+
+    const opciones = this.generarOpciones(options || [], placeholder);
+    const opcionSeleccionada = this.findOpcionSeleccionada(opciones, value);
+    const opcionesFiltradas = this.filtrarOpciones(opciones, busqueda);
 
     return (
       <React.Fragment>
-        <Typography variant="body2">{this.props.label}</Typography>
-        <Button
+        <TextField
+          value={opcionSeleccionada ? opcionSeleccionada.label : "Seleccione..."}
+          ref={this.onTextFieldRef}
+          variant={this.props.variant}
+          label={this.props.label}
+          fullWidth={this.props.fullWidth}
+          error={this.props.error}
+          helperText={this.props.helperText}
           onClick={this.onBotonClick}
-          style={{
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-            borderBottom: this.props.disabled === true ? "1px dotted rgba(0, 0, 0, 0.42)" : "1px solid rgba(0, 0, 0, 0.42)",
-            paddingLeft: 0,
-            display: "flex"
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Icon>keyboard_arrow_down</Icon>
+              </InputAdornment>
+            )
           }}
-        >
-          <Typography style={{ flex: 1, textAlign: "initial", textTransform: "capitalize" }}>
-            {opcionSeleccionada ? opcionSeleccionada.label : "Seleccione..."}
-          </Typography>
-          <Icon>keyboard_arrow_down</Icon>
-        </Button>
+        />
+
         <Dialog fullScreen={fullScreen} open={this.state.open} onClose={this.onClose}>
           <DialogContent style={{ padding: 0, display: "flex", flexDirection: "column" }}>
             <div style={{ minHeight: "fit-content", padding: "16px" }}>
               <div style={{ display: "flex", alignItems: "center" }}>
-                <Icon style={{ marginRight: "16px" }}>search</Icon>
                 <TextField
+                  variant="outlined"
                   inputRef={this.onInputRef}
                   name="busqueda"
+                  autoComplete="off"
                   onKeyPress={this.onInputKeyPress}
                   style={{ flex: 1 }}
                   placeholder={this.props.placeholderBusqueda || "Buscar..."}
                   value={this.state.busqueda}
                   onChange={this.onBusquedaChange}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Icon style={{ marginLeft: "16px" }}>search</Icon>
+                      </InputAdornment>
+                    )
+                  }}
                 />
               </div>
             </div>
 
-            <div style={{ flex: 1, overflow: "auto" }}>
-              <List>
-                {opcionesFiltradas.map(opcion => {
-                  return (
-                    <Item
-                      selected={opcion.value == value}
-                      key={opcion.value}
-                      label={opcion.label}
-                      value={opcion.value}
-                      onClick={this.onClick}
-                    />
-                  );
-                })}
-              </List>
+            {/* <List> */}
+            <div style={{ width: "100%", flex: 1, minHeight: 300 }}>
+              <AutoSizer>
+                {({ width, height }) => (
+                  <List
+                    height={height}
+                    overscanRowCount={this.state.overscanRowCount}
+                    noRowsRenderer={this._noRowsRenderer}
+                    rowCount={opcionesFiltradas.length}
+                    rowHeight={this.state.listRowHeight}
+                    rowRenderer={this._rowRenderer}
+                    width={width}
+                  />
+                )}
+              </AutoSizer>
             </div>
           </DialogContent>
 
@@ -156,15 +209,17 @@ class MiSelect extends React.Component {
     );
   }
 
-  transformarTexto = txt => {
-    if (txt === undefined) return "";
-    txt = txt.toLowerCase();
-    txt = txt.replace(/á/g, "a");
-    txt = txt.replace(/é/g, "e");
-    txt = txt.replace(/í/g, "i");
-    txt = txt.replace(/ó/g, "o");
-    txt = txt.replace(/ú/g, "u");
-    return txt;
+  _rowRenderer = ({ index, isScrolling, key, style }) => {
+    const { options, value, placeholder, listRowHeight } = this.props;
+    const { busqueda } = this.state;
+
+    const opciones = this.generarOpciones(options || [], placeholder);
+    const opcionSeleccionada = this.findOpcionSeleccionada(opciones, value);
+    const opcionesFiltradas = this.filtrarOpciones(opciones, busqueda);
+
+    const data = opcionesFiltradas[index];
+
+    return <Item style={style} label={data.label} value={data.value} onClick={this.onClick} key={key} height={listRowHeight} />;
   };
 }
 
@@ -179,7 +234,7 @@ class Item extends React.PureComponent {
 
   render() {
     return (
-      <ListItem button onClick={this.onClick} selected={this.props.selected}>
+      <ListItem button onClick={this.onClick} selected={this.props.selected} style={{ height: this.props.height }} style={this.props.style}>
         <ListItemText primary={this.props.label} />
       </ListItem>
     );

@@ -14,3 +14,6 @@ export const ENTIDADES_SET = "ENTIDADES_SET";
 
 //Drawer
 export const DRAWER_TOGGLE = "TOGGLE_DRAWER";
+
+//General
+export const GENERAL_VISIBLE = "GENERAL_VISIBLE";

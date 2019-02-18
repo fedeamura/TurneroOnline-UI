@@ -346,7 +346,7 @@ class TurneroCalendario extends React.Component {
             {this.renderInfoContextual()}
 
             <Grid container className={classes.grid}>
-              <Grid item xs={12} md={5} className={classNames(classes.colCalendario, this.state.infoTurnero  && "visible")}>
+              <Grid item xs={12} md={5} className={classNames(classes.colCalendario, this.state.infoTurnero && "visible")}>
                 {this.renderCalendarioMes()}
               </Grid>
 
@@ -380,10 +380,19 @@ class TurneroCalendario extends React.Component {
           />
         </MiCard>
         <div className="textos">
-          <Typography variant="headline">
+        <Typography variant="body1">
+            <b>Entidad: </b>
+            {this.state.infoTurnero ? this.state.infoTurnero.entidadNombre : ""}
+          </Typography>
+          <Typography variant="body1">
             <b>Trámite: </b>
             {this.state.infoTurnero ? this.state.infoTurnero.tramiteNombre : ""}
           </Typography>
+          <Typography variant="body1">
+            <b>Turnero: </b>
+            {this.state.infoTurnero ? this.state.infoTurnero.nombre : ""}
+          </Typography>
+
           <Typography onClick={this.onBotonTurneroClick} variant="body1" className={classes.linkInteres}>
             Ver mas información
           </Typography>
@@ -612,7 +621,7 @@ class TurneroCalendario extends React.Component {
             <Typography variant="body1">{this.state.infoTurnero.tramiteNombre}</Typography>
           </div>
           {/* Ubicacion */}
-          {this.state.infoTurnero.ubicaciones != undefined && (
+          {this.state.infoTurnero.ubicaciones != undefined && this.state.infoTurnero.ubicaciones.length != 0 && (
             <div className="dialogo_info">
               <Typography variant="body2">Ubicación: </Typography>
               <Typography variant="body1">{this.state.infoTurnero.ubicaciones[0].direccion}</Typography>

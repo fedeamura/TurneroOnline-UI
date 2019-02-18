@@ -18,4 +18,5 @@ store.subscribe(() => {
   }
   /*eslint-enable no-undef*/
 });
+
 export default store;

@@ -2,13 +2,14 @@ import _ from "lodash";
 
 const metodos = {
   reservar: id => {
-    const url = window.Config.WS_TURNERO + "/v1/Turno/Reservar/" + id;
+    const url = window.Config.WS_TURNERO + "/v1/Turno/Reservar";
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "--IdTurno": id,
           "--Token": localStorage.getItem("token")
         }
       })

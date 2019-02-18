@@ -52,12 +52,14 @@ const styles = theme => {
     },
     contenedorUbicacionTextos: {},
     mapaUbicacion: {
-      marginRight: "16px",
+      marginRight: theme.spacing.unit * 2,
       backgroundSize: "cover",
       backgroundPosition: "center",
-      borderRadius: "16px",
-      width: "156px",
-      height: "156px"
+      borderRadius: 16,
+      minWidth: 156,
+      maxWidth: 156,
+      minHeight: 156,
+      maxHeight: 156
     },
     ubicacionBotonMapa: {
       marginTop: "16px"

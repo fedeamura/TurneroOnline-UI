@@ -3,7 +3,6 @@ import React from "react";
 //Styles
 import classNames from "classnames";
 import { withStyles } from "@material-ui/core/styles";
-import withWidth, { isWidthUp } from "@material-ui/core/withWidth";
 import styles from "./styles";
 
 //Router
@@ -15,16 +14,14 @@ import { goBack, push } from "connected-react-router";
 import { cerrarSesion } from "@Redux/Actions/usuario";
 
 //Componentes
-import { Grid, Button } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
 
 //Mis componentes
 import MiCard from "@Componentes/MiCard";
 import PanelTurneroDetalle from "./PanelTurneroDetalle";
 import _MiPagina from "../_MiPagina";
-
-//Recursos
-import ToolbarLogo from "@Resources/imagenes/escudo_muni_texto_verde.png";
-import ToolbarLogo_Chico from "@Resources/imagenes/escudo_muni_verde.png";
 
 //Rules
 import Rules_Turnero from "@Rules/Rules_Turnero";
@@ -62,7 +59,6 @@ class TurneroDetalle extends React.Component {
     this.setState({ cargando: true }, () => {
       Rules_Turnero.getDetalle(this.state.id)
         .then(data => {
-          console.log(data);
           this.setState({ error: undefined, data: data }, () => {
             setTimeout(() => {
               this.setState({ cardVisible: true });
@@ -95,10 +91,11 @@ class TurneroDetalle extends React.Component {
 
     return (
       <React.Fragment>
-        <_MiPagina cargando={this.state.cargando} toolbarTitulo="Turnero online" onToolbarTituloClick={this.onToolbarTituloClick}>
+        <_MiPagina cargando={this.state.cargando}>
           <React.Fragment>
             {this.state.data != undefined && (
               <div className={classNames(classes.card, this.state.cardVisible && "visible")}>
+                {this.renderInfoContextual()}
                 <MiCard>
                   <Grid container spacing={32} direction="row">
                     <Grid item xs={12}>
@@ -123,10 +120,31 @@ class TurneroDetalle extends React.Component {
     );
   }
 
-  renderToolbarLogo() {
-    const { classes, width } = this.props;
-    let url = isWidthUp("md", width) ? ToolbarLogo : ToolbarLogo_Chico;
-    return <div className={classes.logoMuni} style={{ backgroundImage: "url(" + url + ")" }} />;
+  renderInfoContextual() {
+    const { classes } = this.props;
+    console.log(this.state.data);
+    return (
+      <div className={classNames(classes.contenedorInfoTurnero, this.state.data && "visible")}>
+        <MiCard padding={false}>
+          <div
+            className="imagen"
+            style={{
+              backgroundImage: `url(${this.state.data ? this.state.data.entidadImagen : ""})`
+            }}
+          />
+        </MiCard>
+        <div className="textos">
+          <Typography variant="body1">
+            <b>Entidad: </b>
+            {this.state.data ? this.state.data.entidadNombre : ""}
+          </Typography>
+          <Typography variant="body1">
+            <b>Trámite: </b>
+            {this.state.data ? this.state.data.tramiteNombre : ""}
+          </Typography>
+        </div>
+      </div>
+    );
   }
 }
 
@@ -136,6 +154,5 @@ componente = connect(
   mapDispatchToProps
 )(componente);
 componente = withStyles(styles)(componente);
-componente = withWidth()(componente);
 componente = withRouter(componente);
 export default componente;

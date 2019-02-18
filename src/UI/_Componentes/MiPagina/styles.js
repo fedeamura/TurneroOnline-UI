@@ -10,7 +10,9 @@ const styles = theme => ({
     display: "flex",
     flexDirection: "column"
   },
-  separadorToolbar: theme.mixins.toolbar,
+  separadorToolbar: {
+    minHeight: "64px"
+  },
   content: {
     flex: 1,
     width: "100%",
@@ -31,6 +33,50 @@ const styles = theme => ({
   contentOverlayCargandoVisible: {
     opacity: 1,
     pointerEvents: "auto"
+  },
+  contenedorBreadcrumbs: {
+    padding: "8px",
+    paddingLeft: "16px",
+    paddingRight: "16px",
+    backgroundColor: "rgba(255,255,255,0.7)",
+    display: "flex",
+    overflow: "auto",
+    maxWidth: "100%",
+    "& > .breadcrumb": {
+      minHeight: "40px",
+      maxHeight: "40px",
+      display: "flex",
+      alignItems: "center",
+      cursor: "pointer",
+      "& *": {
+        cursor: "pointer"
+      },
+      "& .textos": {
+        minHeight: "40px",
+        maxHeight: "40px",
+        display: "flex",
+        flexDirection: "column",
+        transition: "all 0.3s",
+        padding: 4,
+        borderRadius: "4px",
+        justifyContent: "center",
+        backgroundColor: "rgba(0,0,0,0.025)",
+        border:'1px solid rgba(0,0,0,0.05)',
+        "& .texto": {
+          lineHeight: 1
+          // overflow: "hidden",
+          // textOverflow: "ellipsis",
+          // display: "-webkit-box",
+          // "-webkitBoxOrient": "vertical",
+          // "-webkitLineClamp": 1
+        }
+      },
+      "&:hover": {
+        "& .textos": {
+          backgroundColor: "rgba(0,0,0,0.05)"
+        }
+      }
+    }
   }
 });
 

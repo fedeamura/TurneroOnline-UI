@@ -1,5 +1,16 @@
+const botonAppWidth = 80;
+const botonAppMargin = 8;
 const styles = theme => {
   return {
+    root: {
+      opacity: 0,
+      pointerEvents: "none",
+      transition: "opacity 0.3s",
+      "&.visible": {
+        opacity: 1,
+        pointerEvents: "all"
+      }
+    },
     paginaContent: {
       overflow: "auto"
     },
@@ -32,6 +43,34 @@ const styles = theme => {
         flexDirection: "row",
         minWidth: "126px",
         maxWidth: "126px"
+      }
+    },
+    contenedorBotonesApp: {
+      paddingLeft: 12,
+      paddingRight: 12,
+      maxWidth: (botonAppWidth + botonAppMargin * 2) * 3 + 24,
+      minWidth: (botonAppWidth + botonAppMargin * 2) * 3 + 24,
+      outline: "none",
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      alignItems: "center"
+    },
+    botonApp: {
+      margin: botonAppMargin,
+      maxWidth: botonAppWidth,
+      minWidth: botonAppWidth,
+      overflow: "hidden",
+      "& .icono": {
+        width: 50,
+        height: 50
+      },
+      "& .nombre": {
+        marginTop: 8,
+        minHeight: 40,
+        maxHeight: 40,
+        fontSize: "12px",
+        textTransform: "initial"
       }
     }
   };

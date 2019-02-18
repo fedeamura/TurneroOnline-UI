@@ -13,11 +13,12 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { goBack, push } from "connected-react-router";
 import { cerrarSesion } from "@Redux/Actions/usuario";
+import { setVisible } from "@Redux/Actions/general";
 
 //Mis componentes
 import MiPagina from "@Componentes/MiPagina";
 import MiContent from "@Componentes/MiContent";
-
+import MenuApps from "../MenuApps";
 //Recursos
 import ToolbarLogo from "@Resources/imagenes/escudo_muni_texto_verde.png";
 import ToolbarLogo_Chico from "@Resources/imagenes/escudo_muni_verde.png";
@@ -38,14 +39,15 @@ const mapDispatchToProps = dispatch => ({
   },
   cerrarSesion: () => {
     dispatch(cerrarSesion());
+  },
+  setVisible: visible => {
+    dispatch(setVisible(visible));
   }
 });
 
-class _MiPagina extends React.Component {
+class _MiPagina extends React.PureComponent {
   constructor(props) {
     super(props);
-
-    this.state = {};
   }
 
   onToolbarTituloClick = () => {
@@ -53,11 +55,19 @@ class _MiPagina extends React.Component {
   };
 
   onCerrarSesionClick = () => {
-    this.props.cerrarSesion();
+    this.props.setVisible(false);
+    setTimeout(() => {
+      this.props.cerrarSesion();
+      window.location.href = window.Config.URL_LOGIN + "?url=" + this.props.location.pathname + this.props.location.search;
+    }, 500);
   };
 
   onMiPerfilClick = () => {
     window.location.href = window.Config.URL_MI_PERFIL + "/#/?token=" + this.props.token;
+  };
+
+  onBreadcrumbClick = url => {
+    this.props.redirigir(url);
   };
 
   render() {
@@ -72,9 +82,13 @@ class _MiPagina extends React.Component {
       <React.Fragment>
         <MiPagina
           cargando={this.props.cargando}
+          onBreadcrumbClick={this.onBreadcrumbClick}
           toolbarTitulo={this.props.toolbarTitulo || window.Config.NOMBRE_SISTEMA}
+          toolbarBreadcrumbs={this.props.toolbarBreadcrumbs || []}
+          breadcrumbs={this.props.breadcrumbs || []}
           toolbarClassName={classes.toolbar}
           toolbarRenderLogo={this.renderToolbarLogo()}
+          toolbarChildren={this.renderApps()}
           toolbarLeftIcon={toolbarLeftIcon}
           toolbarLeftIconClick={this.props.toolbarLeftIconClick || this.props.goBack}
           onToolbarTituloClick={this.props.onToolbarTituloClick || this.onToolbarTituloClick}
@@ -97,6 +111,15 @@ class _MiPagina extends React.Component {
     const { classes, width } = this.props;
     let url = isWidthUp("md", width) ? ToolbarLogo : ToolbarLogo_Chico;
     return <div className={classes.logoMuni} style={{ backgroundImage: "url(" + url + ")" }} />;
+  }
+
+  renderApps() {
+    return (
+      <React.Fragment>
+        {this.props.toolbarChildren}
+        <MenuApps token={this.props.token} />
+      </React.Fragment>
+    );
   }
 }
 

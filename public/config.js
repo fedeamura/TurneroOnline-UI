@@ -1,11 +1,12 @@
 const DEPLOY = 1;
 const TEST = 2;
 const LOCAL = 3;
-const ENTORNO = TEST;
+const ENTORNO = DEPLOY;
+// const ENTORNO =LOCAL;
 
 //WS Turnero
 const URL_WS_TURNERO_LOCAL = "http://localhost:30001";
-const URL_WS_TURNERO_TEST = "https://srv-dev04.cordoba.local/WSTurneroOnline";
+const URL_WS_TURNERO_TEST = "https://srv-dev04.cordoba.local/WSTurneroOnline_Bridge";
 const URL_WS_TURNERO_DEPLOY = "https://servicios2.cordoba.gov.ar/WSTurneroOnline_Bridge";
 let URL_WS_TURNERO = URL_WS_TURNERO_DEPLOY;
 
@@ -38,6 +39,8 @@ switch (ENTORNO) {
     }
     break;
 }
+// URL_WS_TURNERO = "http://localhost:30001";
+// URL_WS_TURNERO = "https://srv-dev04.cordoba.local/WSTurneroOnline";
 
 var Config = {
   BASE_URL: "/TurneroOnline",

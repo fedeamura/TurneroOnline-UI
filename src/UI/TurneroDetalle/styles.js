@@ -1,5 +1,26 @@
 const styles = theme => {
   return {
+    contenedorInfoTurnero: {
+      display: "flex",
+      marginBottom: theme.spacing.unit * 4,
+      alignItems: "center",
+      opacity: 0,
+      transition: "all 0.3s",
+      "& .textos": {
+        marginLeft: theme.spacing.unit * 2
+      },
+      "& .imagen": {
+        minWidth: 72,
+        maxWidth: 72,
+        minHeight: 72,
+        maxHeight: 72,
+        backgroundSize: "cover",
+        backgroundPosition: "center"
+      },
+      "&.visible": {
+        opacity: 1
+      }
+    },
     contentClassNames: {
       display: "flex",
       flexDirection: "column"

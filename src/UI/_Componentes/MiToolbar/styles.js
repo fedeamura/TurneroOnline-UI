@@ -29,7 +29,7 @@ const styles = theme => {
       width: 40,
       height: 40,
       borderRadius: 40,
-      backgroundColor: "white"
+      backgroundColor: "rgba(0,0,0,0.05)"
     },
     menuUsuario: {
       "& div:nth-child(2)": {
@@ -73,13 +73,50 @@ const styles = theme => {
       opacity: 1
     },
     contenedorCuerpo: {
-      flex: 1
+      flex: 1,
+      display: "flex",
+      alignItems: "start",
+      flexDirection: "column",
+      overflow: "hidden"
     },
     contenedorTitulo: {
       display: "flex",
-      flexDirection: "column",
-      [theme.breakpoints.up("md")]: {
-        flexDirection: "row"
+      flexDirection: "row",
+      "& *": {
+        maxWidth: "100%"
+      }
+      // [theme.breakpoints.up("md")]: {
+      //   flexDirection: "row"
+      // }
+    },
+    contenedorBreadcrumbs: {
+      display: "flex",
+      overflow: "auto",
+      maxWidth: "100%",
+      "& > .breadcrumb": {
+        display: "flex",
+        alignItems: "center",
+        cursor: "pointer",
+        "& *": {
+          cursor: "pointer"
+        },
+        "& .texto": {
+          transition: "all 0.3s",
+          padding: 4,
+          paddingTop: 0,
+          paddingBottom: 0,
+          borderRadius: "4px",
+          // overflow: "hidden",
+          // textOverflow: "ellipsis",
+          // display: "-webkit-box",
+          // "-webkitBoxOrient": "vertical",
+          // "-webkitLineClamp": 1
+        },
+        "&:hover": {
+          "& .texto": {
+            backgroundColor: "rgba(0,0,0,0.05)"
+          }
+        }
       }
     },
 

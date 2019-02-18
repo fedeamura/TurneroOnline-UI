@@ -7,7 +7,6 @@ import styles from "./styles";
 
 //REDUX
 import { connect } from "react-redux";
-import Icon from "@material-ui/core/Icon";
 import { push } from "connected-react-router";
 
 //Componentes
@@ -19,9 +18,11 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Avatar from "@material-ui/core/Avatar";
 import LinearProgress from "@material-ui/core/LinearProgress";
+import Icon from "@material-ui/core/Icon";
 
 //Mis componentes
 import CordobaFilesUtils from "../Utils/CordobaFiles";
+import { Button, ButtonBase } from "@material-ui/core";
 
 // import Lottie from "react-lottie";
 // import * as animNotificaciones from "@Resources/animaciones/anim_notificaciones.json";
@@ -101,7 +102,7 @@ class MiToolbar extends React.Component {
   };
 
   render() {
-    let { classes, titulo, usuario, subtitulo, mostrarUsuario } = this.props;
+    let { classes, titulo, usuario, subtitulo, mostrarUsuario, breadcrumbs } = this.props;
 
     mostrarUsuario = mostrarUsuario == undefined || mostrarUsuario != false;
 
@@ -127,13 +128,10 @@ class MiToolbar extends React.Component {
             </IconButton>
           )}
 
-          {/* Left icon */}
-          {/* {this.props.renderLeftIcon === undefined && this.props.leftIcon === undefined && <div style={{ width: 16 }} />} */}
-
           {/* Logo muni */}
           {this.props.renderLogo}
-          {/* {this.props.renderLogo !== undefined && this.props.renderLogo()} */}
 
+          {/* Cuerpo */}
           <div className={classes.contenedorCuerpo}>
             <div className={classes.contenedorTitulo}>
               <Typography
@@ -152,8 +150,25 @@ class MiToolbar extends React.Component {
                 </Typography>
               )}
             </div>
-            {this.props.children}
+
+            {/* Breadcrumbs */}
+            {breadcrumbs && breadcrumbs.length != 0 && (
+              <div className={classes.contenedorBreadcrumbs}>
+                {breadcrumbs.map((bread, index) => {
+                  return (
+                    <div className="breadcrumb">
+                      <Typography variant="subtitle1" className="texto" noWrap>
+                        {bread.texto}
+                      </Typography>
+                      {index != breadcrumbs.length - 1 && <Icon className="icono">chevron_right</Icon>}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
+
+          {this.props.children}
 
           {/* Boton notificaciones */}
           {/* <IconButton onClick={this.onBotonNotificacionesClick} color="inherit" style={{ overflow: "hidden" }}>

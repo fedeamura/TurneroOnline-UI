@@ -36,7 +36,7 @@ class CardEntidad extends React.Component {
     if (this.props.onClick == undefined) return;
     this.props.onClick(this.props.data);
   };
-  
+
   render() {
     const { classes, location } = this.props;
     // const values = queryString.parse(location.search);
@@ -44,7 +44,7 @@ class CardEntidad extends React.Component {
 
     return (
       <React.Fragment>
-        <MiCard padding={false}>
+        <MiCard padding={false} contentClassName={classes.contentClassName}>
           <div
             className={classes.imagen}
             style={{
@@ -52,16 +52,14 @@ class CardEntidad extends React.Component {
             }}
           />
           <div className={classes.textos}>
-            <Typography variant="headline">
-              {this.props.data.nombre || ""}
-            </Typography>
+            <Typography variant="headline">{this.props.data.nombre || ""}</Typography>
             <Typography>{this.props.data.descripcion || ""}</Typography>
-
-            <div className={classes.contenedorBotones}>
-              <Button color="primary" variant="raised" onClick={this.onClick}>
-                Ver tramites y turnos
-              </Button>
-            </div>
+            <div className="shadow" />
+          </div>
+          <div className={classes.contenedorBotones}>
+            <Button color="primary" variant="raised" onClick={this.onClick}>
+              Ver tramites y turnos
+            </Button>
           </div>
         </MiCard>
       </React.Fragment>
