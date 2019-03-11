@@ -11,7 +11,7 @@ const styles = theme => ({
     flexDirection: "column"
   },
   separadorToolbar: {
-    minHeight: "64px"
+    minHeight: 56
   },
   content: {
     flex: 1,

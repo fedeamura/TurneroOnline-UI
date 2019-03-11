@@ -39,8 +39,8 @@ switch (ENTORNO) {
     }
     break;
 }
-// URL_WS_TURNERO = "http://localhost:30001";
-// URL_WS_TURNERO = "https://srv-dev04.cordoba.local/WSTurneroOnline";
+
+// URL_LOGIN = URL_LOGIN_LOCAL;
 
 var Config = {
   BASE_URL: "/TurneroOnline",
@@ -54,7 +54,8 @@ var Config = {
     "f_zq38nzky73iwxm6fz4m812vx68ggr28xgokqfwx7zf9ws7rd6_s7mn985gcqtehf6vpicq_chqiv3_e9rdlsjal4pmw_uhnu9318riap_p07eoe5cd_q4z65kw304ataczwaihsic6t4lo0bh18qi81k86x6qlv_7z5q2ew6w1n8gbu772sdcd3e8mcnuw31ku8wtkkd",
   URL_MI_PERFIL: "https://servicios2.cordoba.gov.ar/VecinoVirtual/Utils/MiPerfil",
   GOOGLE_STATIC_MAP_KEY: "AIzaSyCKFQtmXhN0YwgjLDQhuwZpwrWZjH5xJcY",
-  NOMBRE_SISTEMA: "Turnero Online"
+  NOMBRE_SISTEMA: "Turnero Online",
+  VERSION: 3
 };
 
 module.exports = Config;

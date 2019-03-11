@@ -2,7 +2,9 @@ const styles = theme => {
   return {
     toolbar: {
       paddingLeft: 12,
-      paddingRight: 12 // keep right padding when drawer closed
+      minHeight: 56,
+      maxHeight: 56,
+      paddingRight: 12
     },
     toolbarIcon: {
       display: "flex",
@@ -105,7 +107,7 @@ const styles = theme => {
           padding: 4,
           paddingTop: 0,
           paddingBottom: 0,
-          borderRadius: "4px",
+          borderRadius: "4px"
           // overflow: "hidden",
           // textOverflow: "ellipsis",
           // display: "-webkit-box",
@@ -120,11 +122,21 @@ const styles = theme => {
       }
     },
 
-    title: {},
+    title: {
+      fontSize: 16,
+      [theme.breakpoints.up("sm")]: {
+        fontSize: 20
+      }
+    },
     subtitle: {
       [theme.breakpoints.up("md")]: {
         marginLeft: theme.spacing.unit
       }
+    },
+    botonUsuario: {
+      padding: 0,
+      marginRight: theme.spacing.unit,
+      marginLeft: theme.spacing.unit
     }
   };
 };

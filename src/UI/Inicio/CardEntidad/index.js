@@ -52,9 +52,9 @@ class CardEntidad extends React.Component {
             }}
           />
           <div className={classes.textos}>
-            <Typography variant="headline">{this.props.data.nombre || ""}</Typography>
-            <Typography>{this.props.data.descripcion || ""}</Typography>
-            <div className="shadow" />
+            <Typography variant="title">{this.props.data.nombre || ""}</Typography>
+            {/* <Typography>{this.props.data.descripcion || ""}</Typography> */}
+            {/* <div className="shadow" /> */}
           </div>
           <div className={classes.contenedorBotones}>
             <Button color="primary" variant="raised" onClick={this.onClick}>

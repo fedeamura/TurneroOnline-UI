@@ -46,9 +46,14 @@ import Rules_Turno from "@Rules/Rules_Turno";
 //Globalizacion
 import moment from "moment";
 import "moment/locale/es";
+import { orange, grey } from "@material-ui/core/colors";
 moment.locale("es");
 
 const localizer = BigCalendar.momentLocalizer(moment);
+
+const MODO_SIN_TURNOS = 0;
+const MODO_FUERA_RANGO = 1;
+const MODO_CON_TURNOS = 2;
 
 const mapStateToProps = state => {
   return {
@@ -105,31 +110,23 @@ class TurneroCalendario extends React.Component {
   }
 
   buscarInfoDelMes = (mes, año) => {
-    this.setState({ cargando: true }, () => {
+    this.setState({ cargando: true, modoTurnos: undefined }, () => {
       let fechaInicio = undefined;
-      if (mes == new Date().getMonth() + 1) {
-        let dateHoy = new Date();
-        let diaInicio = dateHoy.getDate();
-        if (diaInicio < 10) diaInicio = "0" + diaInicio;
-        let mesInicio = dateHoy.getMonth() + 1;
-        if (mesInicio < 10) mesInicio = "0" + mesInicio;
-        let añoInicio = dateHoy.getFullYear();
-        fechaInicio = diaInicio + "/" + mesInicio + "/" + añoInicio;
+      let dateHoy = new Date();
+      if (mes == dateHoy.getMonth() + 1 && año == dateHoy.getFullYear()) {
+        fechaInicio = DateUtils.toDateString(dateHoy);
       } else {
-        if (mes < 10) mes = "0" + mes;
-        fechaInicio = "01/" + mes + "/" + año;
+        dateHoy.setFullYear(año);
+        dateHoy.setDate(1);
+        dateHoy.setMonth(mes - 1);
+        fechaInicio = DateUtils.toDateString(dateHoy);
       }
 
       let dateFin = new Date();
+      dateFin.setFullYear(año);
       dateFin.setDate(1);
       dateFin.setMonth(mes);
-
-      let diaFin = dateFin.getDate();
-      if (diaFin < 10) diaFin = "0" + diaFin;
-      let mesFin = dateFin.getMonth() + 1;
-      if (mesFin < 10) mesFin = "0" + mesFin;
-      let añoFin = dateFin.getFullYear();
-      let fechaFin = diaFin + "/" + mesFin + "/" + añoFin;
+      let fechaFin = DateUtils.toDateString(dateFin);
 
       Rules_Turnero.getTurnos({
         idTurnero: this.state.id,
@@ -137,15 +134,19 @@ class TurneroCalendario extends React.Component {
         fechaFin: fechaFin
       })
         .then(data => {
-          if (this.state.primeraVez == true) {
-            this.setState({ primeraVez: false });
-
-            let diaMinimo = _.min(data, "fecha", "inicio");
-            if (diaMinimo != undefined) {
-              let partesDia = diaMinimo.fecha.split("T")[0].split("-");
-              this.onDiaClick(new Date(partesDia[0], parseInt(partesDia[1]) - 1, partesDia[2]));
-            }
+          let modo;
+          if (data.length != 0) {
+            modo = MODO_CON_TURNOS;
+          } else {
+            modo = MODO_SIN_TURNOS;
           }
+          this.setState({ modoTurnos: modo });
+
+          // let fechaInicioTurnero = DateUtils.toDate(this.state.infoTurnero.fechaInicio);
+          // let fechaFinTurnero = DateUtils.toDate(this.state.infoTurnero.fechaFin);
+
+          // console.log(data);
+          // console.log(this.state.infoTurnero);
           this.setState({ dataDelMes: data });
         })
         .catch(error => {
@@ -183,60 +184,57 @@ class TurneroCalendario extends React.Component {
         horarioTurnoSeleccionado: undefined
       },
       () => {
-        setTimeout(() => {
-          let eventos = _.filter(this.state.dataDelMes, item => {
-            let fecha = item.fecha;
-            let partes = fecha.split("T")[0].split("-");
-            let dia = parseInt(partes[2]);
-            let mes = parseInt(partes[1]);
-            let año = parseInt(partes[0]);
+        let eventos = _.filter(this.state.dataDelMes, item => {
+          let fecha = item.fecha;
+          let partes = fecha.split("T")[0].split("-");
+          let dia = parseInt(partes[2]);
+          let mes = parseInt(partes[1]);
+          let año = parseInt(partes[0]);
 
-            return e.getDate() == dia && e.getMonth() + 1 == mes && e.getFullYear() == año;
-          });
+          return e.getDate() == dia && e.getMonth() + 1 == mes && e.getFullYear() == año;
+        });
 
-          let agrupados = _.groupBy(eventos, "inicio", "duracion");
+        let agrupados = _.groupBy(eventos, "inicio", "duracion");
 
-          let resultado = [];
-          for (var property in agrupados) {
-            if (agrupados.hasOwnProperty(property)) {
-              let item = agrupados[property];
-              if (item.length != 0) {
-                let fecha = item[0].fecha;
-                let partes = fecha.split("T")[0].split("-");
-                let dia = parseInt(partes[2]);
-                let mes = parseInt(partes[1]) - 1;
-                let año = parseInt(partes[0]);
+        let resultado = [];
+        for (var property in agrupados) {
+          if (agrupados.hasOwnProperty(property)) {
+            let item = agrupados[property];
+            if (item.length != 0) {
+              let fecha = item[0].fecha;
+              let partes = fecha.split("T")[0].split("-");
+              let dia = parseInt(partes[2]);
+              let mes = parseInt(partes[1]) - 1;
+              let año = parseInt(partes[0]);
 
-                let fechaInicio = new Date(año, mes, dia);
-                fechaInicio.setMinutes(item[0].inicio * 5);
+              let fechaInicio = new Date(año, mes, dia);
+              fechaInicio.setMinutes(item[0].inicio);
 
-                let fechaFin = new Date(año, mes, dia);
-                fechaFin.setMinutes(item[0].inicio * 5);
-                fechaFin.setMinutes(fechaFin.getMinutes() + item[0].duracion * 5);
+              let fechaFin = new Date(año, mes, dia);
+              fechaFin.setMinutes(item[0].inicio);
+              fechaFin.setMinutes(fechaFin.getMinutes() + item[0].duracion);
 
-                resultado.push({
-                  id: item[0].id,
-                  start: fechaInicio,
-                  end: fechaFin,
-                  title: "Turno disponible"
-                });
-              }
+              resultado.push({
+                id: item[0].id,
+                start: fechaInicio,
+                end: fechaFin,
+                title: "Turno disponible"
+              });
             }
           }
+        }
 
-          let alertaDia = undefined;
-          if (resultado.length == 0) {
-            alertaDia = "No hay turnos disponibles para el día seleccionado";
-          }
+        let alertaDia = undefined;
+        if (resultado.length == 0) {
+          alertaDia = "No hay turnos disponibles para el día seleccionado";
+        }
 
-          // document.getElementsByClassName("rbc-time-content")[0].scrollTop = 0;
-          this.setState({
-            diaSeleccionado: e,
-            eventos: resultado,
-            calendarioDiaVisible: true,
-            alertaDia: alertaDia
-          });
-        }, 300);
+        this.setState({
+          diaSeleccionado: e,
+          eventos: resultado,
+          calendarioDiaVisible: true,
+          alertaDia: alertaDia
+        });
       }
     );
   };
@@ -346,11 +344,11 @@ class TurneroCalendario extends React.Component {
             {this.renderInfoContextual()}
 
             <Grid container className={classes.grid}>
-              <Grid item xs={12} md={5} className={classNames(classes.colCalendario, this.state.infoTurnero && "visible")}>
+              <Grid item xs={12} md={6} className={classNames(classes.colCalendario, this.state.infoTurnero && "visible")}>
                 {this.renderCalendarioMes()}
               </Grid>
 
-              <Grid item xs={12} md={7} className={classNames(classes.colCalendarioDia, this.state.calendarioDiaVisible && "visible")}>
+              <Grid item xs={12} md={6} className={classNames(classes.colCalendarioDia, this.state.infoTurnero && "visible")}>
                 {this.renderCalendarioDia()}
               </Grid>
             </Grid>
@@ -380,7 +378,7 @@ class TurneroCalendario extends React.Component {
           />
         </MiCard>
         <div className="textos">
-        <Typography variant="body1">
+          <Typography variant="body1">
             <b>Entidad: </b>
             {this.state.infoTurnero ? this.state.infoTurnero.entidadNombre : ""}
           </Typography>
@@ -503,74 +501,83 @@ class TurneroCalendario extends React.Component {
 
   renderCalendarioDia() {
     const { classes } = this.props;
-
-    let diaSeleccionado = "";
-    if (this.state.diaSeleccionado != undefined) {
-      let fecha = this.state.diaSeleccionado;
-      let dia = fecha.getDate();
-      if (dia < 10) dia = "0" + dia;
-      let mes = fecha.getMonth() + 1;
-      if (mes < 10) mes = "0" + mes;
-      let año = fecha.getFullYear();
-      diaSeleccionado = dia + "/" + mes + "/" + año;
-    }
+    const { modoTurnos, diaSeleccionado, eventos } = this.state;
 
     return (
       <MiCard
         padding={false}
         className={classes.contenedorCalendarioDia}
-        rootClassName={classNames(classes.contenedorCalendarioRoot, this.state.calendarioDiaVisible && "visible")}
+        rootClassName={classNames(classes.contenedorCalendarioRoot, "visible")}
       >
-        {/* Encabezado  */}
-        <div className={classNames(classes.encabezadoTurnosDeDia)}>
-          <Typography variant="headline">Turnos disponibles para el dia {diaSeleccionado}</Typography>
-          <IconButton onClick={this.onBotonCancelarDiaSeleccionadoClick}>
-            <Icon>clear</Icon>
-          </IconButton>
-        </div>
-
-        {/* Mensaje sin eventos */}
-        {this.state.alertaDia != undefined && (
-          <div className={classNames(classes.contenedorSinEventos)}>
-            <Typography variant="body2">{this.state.alertaDia}</Typography>
+        {modoTurnos == MODO_SIN_TURNOS && (
+          <div className={classes.panelModoTurnos}>
+            <Icon className="icono" style={{ color: orange["500"] }}>
+              error_outline
+            </Icon>
+            <Typography variant="headline" className="texto">
+              El mes seleccionado no posee turnos disponibles
+            </Typography>
           </div>
         )}
 
-        {this.state.eventos.length != 0 && (
-          <div className={classes.contenedorSeleccioneUnTurno}>
-            <Typography variant="body2">Seleccione un horario</Typography>
+        {modoTurnos == MODO_CON_TURNOS && diaSeleccionado == undefined && (
+          <div className={classes.panelModoTurnos}>
+            <Icon className="icono" style={{ color: grey["500"] }}>
+              today
+            </Icon>
+            <Typography variant="headline" className="texto">
+              Seleccione un día en el calendario
+            </Typography>
           </div>
         )}
 
-        <div className={classes.contenedorTurnos}>
-          <RadioGroup
-            aria-label=""
-            name="horario"
-            value={"" + this.state.horarioTurnoSeleccionado}
-            onChange={this.onRadioTurnoSeleccionadoChange}
-          >
-            {this.state.eventos.map((evento, index) => {
-              let { start, end, id } = evento;
-              let horaInicio = DateUtils.toTimeString(start);
-              let horaFin = DateUtils.toTimeString(end);
-
-              return <FormControlLabel key={index} value={"" + id} control={<Radio />} label={`De ${horaInicio} a ${horaFin}`} />;
-            })}
-          </RadioGroup>
-        </div>
-
-        {this.state.eventos.length != 0 && (
-          <div className={classes.contenedorBotones}>
-            <Button
-              variant="raised"
-              color="primary"
-              onClick={this.onBotonReservarClick}
-              disabled={this.state.horarioTurnoSeleccionado == undefined}
-            >
-              Reservar
-            </Button>
+        {modoTurnos == MODO_CON_TURNOS && diaSeleccionado && eventos.length == 0 && (
+          <div className={classes.panelModoTurnos}>
+            <Icon className="icono" style={{ color: orange["500"] }}>
+              error_outline
+            </Icon>
+            <Typography variant="headline" className="texto">
+              El día seleccionado no posee turnos disponbles
+            </Typography>
           </div>
         )}
+
+        {modoTurnos == MODO_CON_TURNOS && diaSeleccionado && eventos.length != 0 && (
+          <React.Fragment>
+            <div className={classes.contenedorSeleccioneUnTurno}>
+              <Typography variant="body2">Seleccione un horario</Typography>
+            </div>
+
+            <div className={classes.contenedorTurnos}>
+              <RadioGroup
+                aria-label=""
+                name="horario"
+                value={"" + this.state.horarioTurnoSeleccionado}
+                onChange={this.onRadioTurnoSeleccionadoChange}
+              >
+                {this.state.eventos.map((evento, index) => {
+                  let { start, end, id } = evento;
+                  let horaInicio = DateUtils.toTimeString(start);
+                  let horaFin = DateUtils.toTimeString(end);
+
+                  return <FormControlLabel key={index} value={"" + id} control={<Radio />} label={`${horaInicio}`} />;
+                })}
+              </RadioGroup>
+            </div>
+
+            <div className={classes.contenedorBotones}>
+              <Button
+                variant="raised"
+                color="primary"
+                onClick={this.onBotonReservarClick}
+                disabled={this.state.horarioTurnoSeleccionado == undefined}
+              >
+                Reservar
+              </Button>
+            </div>
+          </React.Fragment>
+        )}
+
         {/* Calendario */}
         {/* <BigCalendar
             view="day"

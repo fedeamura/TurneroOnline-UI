@@ -1,6 +1,7 @@
 const styles = theme => {
   return {
     contenedorInfoTurnero: {
+      minHeight: "fit-content",
       display: "flex",
       marginBottom: theme.spacing.unit * 4,
       alignItems: "center",

@@ -30,6 +30,8 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import _ from "lodash";
+import memoize from "memoize-one";
+
 import MiSelect from "@Componentes/MiSelect";
 
 //Mis componentes
@@ -83,9 +85,7 @@ class EntidadDetalle extends React.Component {
         .then(data => {
           let turneroSeleccionadoEnTramite = {};
           _.each(data.tramites, tramite => {
-            var turneros = _.filter(tramite.turneros, t => {
-              return t.publicado == true;
-            });
+            let turneros = this.getTurneros(tramite.turneros);
             if (turneros.length != 0) {
               turneroSeleccionadoEnTramite[tramite.id] = turneros[0].id;
             }
@@ -180,6 +180,29 @@ class EntidadDetalle extends React.Component {
     this.props.redireccionar("/Entidad/" + id);
   };
 
+  getTurneros = memoize(data => {
+    return _.orderBy(
+      _.filter(data || [], t => {
+        return t.publicado == true && t.visible == true;
+      }),
+      "label"
+    );
+  });
+
+  getOpcionesTurnero = memoize(data => {
+    return _.orderBy(
+      _.filter(data || [], t => {
+        return t.publicado == true && t.visible == true;
+      }).map(t => {
+        return {
+          value: t.id + "",
+          label: t.nombre
+        };
+      }),
+      "label"
+    );
+  });
+
   render() {
     const { classes } = this.props;
 
@@ -244,14 +267,7 @@ class EntidadDetalle extends React.Component {
                       {this.state.data.tramites &&
                         this.state.data.tramites.length != 0 &&
                         this.state.data.tramites.map((tramite, index) => {
-                          const opcionesTurneros = _.filter(tramite.turneros, t => {
-                            return t.publicado == true;
-                          }).map(t => {
-                            return {
-                              value: t.id + "",
-                              label: t.nombre
-                            };
-                          });
+                          const opcionesTurneros = this.getOpcionesTurnero(tramite.turneros);
 
                           return (
                             <React.Fragment key={"tramite_" + tramite.id}>
@@ -295,8 +311,7 @@ class EntidadDetalle extends React.Component {
                                           value={"" + this.state.turneroSeleccionadoEnTramite[tramite.id]}
                                           onChange={this.onTurneroChange}
                                         >
-                                          {tramite.turneros.map((turnero, index) => {
-                                            if (turnero.publicado == false) return null;
+                                          {this.getTurneros(tramite.turneros).map((turnero, index) => {
                                             return (
                                               <FormControlLabel
                                                 key={index}

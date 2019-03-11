@@ -1,8 +1,8 @@
 const styles = theme => {
   return {
     contentClassName: {
-      maxHeight: 500,
-      minHeight: 500,
+      maxHeight: 350,
+      minHeight: 350,
       display: "flex",
       flexDirection: "column"
     },

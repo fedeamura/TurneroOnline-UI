@@ -255,66 +255,46 @@ class App extends React.Component {
 
             <MiBaner modo="error" visible={this.state.mostrarError} mensaje={this.state.error} />
 
-            <MiCard titulo="Mis turnos" rootClassName={classNames(classes.cardMisTurnos, this.state.mostrarCardMisTurnos && "visible")}>
-              <div className={classes.contenedorMisTurnos}>
-                {/* Sin turnos */}
-                {this.state.dataTurno.length == 0 && (
-                  <div style={{ display: "flex" }}>
-                    <Icon style={{ marginRight: "8px" }}>info_outline</Icon>
-                    <Typography variant="body2">Todavia no tiene ningun turno asociado.</Typography>
-                  </div>
-                )}
+            {this.state.turnosPendientes && this.state.turnosPendientes.length != 0 && (
+              <MiCard titulo="Próximo turno">
+                <TurnoPendiente data={this.state.turnosPendientes[0]} onClick={this.onTurnoPendienteClick} />
+              </MiCard>
+            )}
 
-                {/* pendientes mas proximos  */}
-                {this.state.turnosPendientes && this.state.turnosPendientes.length != 0 && (
-                  <div>
-                    <Typography variant="body2">Próximos turnos</Typography>
-                    {this.state.turnosPendientes.map((item, index) => {
-                      return <TurnoPendiente key={index} data={item} onClick={this.onTurnoPendienteClick} />;
-                    })}
-                  </div>
-                )}
-
-                {/* separador */}
-                {this.state.turnosPendientes &&
-                  this.state.turnosPendientes.length != 0 &&
-                  this.state.contadores &&
-                  this.state.contadores.length != 0 && <div style={{ height: 32 }} />}
-
-                {/* contadores */}
-                {this.state.contadores && this.state.contadores.length != 0 && (
-                  <div className={classes.contenedorContadores}>
-                    {this.state.contadores.map((contador, index) => {
-                      if (contador.contador === 0) return null;
-                      return (
-                        <div
-                          className={classes.contadorTurno}
-                          key={index}
-                          estado={contador.estado.keyValue}
-                          onClick={this.onBotonMisTurnosEstadoClick}
-                        >
-                          <ButtonBase className={"button"} style={{ backgroundColor: contador.estado.color }}>
-                            <Typography variant="subheading">{contador.contador}</Typography>
-                          </ButtonBase>
-                          <Typography variant="body2">{contador.estado.nombre}</Typography>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* boton todos los turnos  */}
-                {this.state.dataTurno.length != 0 && (
-                  <div className={classes.misTurnosContenedorBotones}>
-                    <Button color="primary" variant="raised" onClick={this.onBotonMisTurnosClick}>
-                      Ver mis turnos
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </MiCard>
-
-            <div style={{ height: 56 }} />
+            {this.state.dataTurno.length != 0 && (
+              <MiCard rootClassName={classNames(classes.cardMisTurnos, this.state.mostrarCardMisTurnos && "visible")} padding={false}>
+                <div className={classes.contenedorMisTurnos}>
+                  {/* contadores */}
+                  {this.state.contadores && this.state.contadores.length != 0 && (
+                    <div className={classes.cardContadores}>
+                      <div className={classes.contenedorContadores} style={{ flex: 1 }}>
+                        {this.state.contadores.map((contador, index) => {
+                          if (contador.contador === 0) return null;
+                          return (
+                            <ButtonBase
+                              className={classes.contadorTurno}
+                              key={index}
+                              estado={contador.estado.keyValue}
+                              onClick={this.onBotonMisTurnosEstadoClick}
+                            >
+                              <Typography className="contador" variant="subheading" style={{ backgroundColor: contador.estado.color }}>
+                                {contador.contador}
+                              </Typography>
+                              <Typography variant="body2">{contador.estado.nombre}</Typography>
+                            </ButtonBase>
+                          );
+                        })}
+                      </div>
+                      <div className="boton">
+                        <Button color="primary" variant="raised" onClick={this.onBotonMisTurnosClick}>
+                          Ver todos mis turnos
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </MiCard>
+            )}
 
             <div className={classNames(classes.cardEntidades, this.state.mostrarCardEntidades && "visible")}>
               <Typography style={{ marginLeft: "32px", marginTop: "32px" }} variant="headline" className={classes.titulo}>

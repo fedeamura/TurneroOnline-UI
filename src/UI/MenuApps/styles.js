@@ -5,10 +5,29 @@ const styles = theme => {
   return {
     boton: {
       color: "white",
-     
-    },
-    icon: {
-      marginRight: "4px"
+      maxWidth: 36,
+      minWidth: 36,
+      maxHeight: 36,
+      minHeight: 36,
+      padding: 0,
+      marginRight: theme.spacing.unit,
+      marginLeft: theme.spacing.unit,
+      [theme.breakpoints.up("sm")]: {
+        maxWidth: 300,
+        padding: theme.spacing.unit
+      },
+      "& .textoServicios": {
+        display: "none",
+        [theme.breakpoints.up("sm")]: {
+          display: "inherit"
+        }
+      },
+      "& .icon": {
+        marginRight: 0,
+        [theme.breakpoints.up("sm")]: {
+          marginRight: 4
+        }
+      }
     },
     menu: {
       paddingLeft: 12,

@@ -46,7 +46,9 @@ class Turno extends React.PureComponent {
             <Typography variant="headline">{this.getDia(this.props.data.fecha)}</Typography>
           </div>
           <div>
-            <Typography variant="headline">{this.props.data.tramiteNombre}</Typography>
+            <Typography variant="headline" style={{ textAlign: "left" }}>
+              {this.props.data.tramiteNombre}
+            </Typography>
             <div className={classes.contenedorTextos}>
               <Typography variant="body2">Codigo:</Typography>
               <Typography variant="body1">{`${this.props.data.codigo}/${this.props.data.año}`}</Typography>

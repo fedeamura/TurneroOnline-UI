@@ -2,7 +2,8 @@ import "./public-path";
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "@UI/App";
-import registerServiceWorker from "./registerServiceWorker";
+import { unregister } from './registerServiceWorker';
+
 import { hot } from "react-hot-loader";
 
 import MuiPickersUtilsProvider from "material-ui-pickers/utils/MuiPickersUtilsProvider";
@@ -30,4 +31,4 @@ let MiApp = ()=>(
 hot(module)(MiApp);
 ReactDOM.render(<MiApp/>,document.getElementById("root"));
 
-registerServiceWorker();
+unregister();

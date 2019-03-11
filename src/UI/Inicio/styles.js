@@ -21,8 +21,23 @@ const styles = theme => {
         }
       }
     },
+    cardContadores: {
+      display: "flex",
+      alignItems: "center",
+      flexDirection: "column",
+      "& .boton": {
+        padding: 16
+      },
+      [theme.breakpoints.up("sm")]: {
+        flexDirection: "row",
+        "& .boton": {
+          alignSelf: "flex-end"
+        }
+      }
+    },
     cardMisTurnos: {
       opacity: 0,
+      marginTop: 16,
       transform: "translateY(50px)",
       transition: "all 0.3s",
       pointerEvents: "none",
@@ -39,27 +54,31 @@ const styles = theme => {
     contadorTurno: {
       margin: theme.spacing.unit,
       cursor: "pointer",
+      transition: "all 0.3s",
       display: "flex",
-      flexDirection: "column",
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      transition: "all 0.3s",
+      color: "white",
+      backgroundColor: "rgba(0,0,0,0.05)",
+      padding: theme.spacing.unit,
+      borderRadius: "72px",
+      "& .contador": {
+        width: 26,
+        height: 26,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        marginRight: theme.spacing.unit,
+        justifyContent: "center",
+        color: "white",
+        borderRadius: "72px"
+      },
+      "& *": {
+        color: "black"
+      },
       "&:hover": {
         opacity: 0.7
-      },
-      "& > .button": {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "48px",
-        height: "48px",
-        borderRadius: "72px",
-        color: "white",
-        marginBottom: theme.spacing.unit,
-        "& *": {
-          color: "white"
-        }
       }
     },
     misTurnosContenedorBotones: {

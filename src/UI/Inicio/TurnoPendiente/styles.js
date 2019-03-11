@@ -2,9 +2,9 @@ const styles = theme => {
   return {
     root: {
       display: "flex",
-      alignItems: "center",
-      justifyContent: 'flex-start',
-      width:'100%',
+      alignItems: "start",
+      justifyContent: "flex-start",
+      width: "100%",
       cursor: "pointer",
       transition: "all 0.3s",
       "&:not(:last-child)": {
@@ -20,6 +20,7 @@ const styles = theme => {
     },
 
     contenedorFecha: {
+      marginTop: theme.spacing.unit,
       display: "flex",
       minWidth: "72px",
       minHeight: "72px",

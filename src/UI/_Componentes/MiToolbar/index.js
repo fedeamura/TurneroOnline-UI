@@ -137,7 +137,6 @@ class MiToolbar extends React.Component {
               <Typography
                 variant="title"
                 color="inherit"
-                noWrap
                 className={classes.title}
                 onClick={this.props.onTituloClick}
                 style={{ cursor: "pointer" }}
@@ -194,7 +193,7 @@ class MiToolbar extends React.Component {
 
           {/* Icono del usuario */}
           {mostrarUsuario && usuario && (
-            <IconButton onClick={this.onUsuarioPress} color="inherit">
+            <IconButton onClick={this.onUsuarioPress} className={classes.botonUsuario} color="inherit">
               <Avatar alt="Menu del usuario" src={urlFotoPerfilMiniatura} className={classNames(classes.icono)} />
             </IconButton>
           )}

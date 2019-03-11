@@ -23,6 +23,7 @@ class MiCard extends React.PureComponent {
         )}
 
         <Card
+          onClick={this.props.onClick}
           elevation={this.props.elevation}
           className={classNames(
             classes.card,

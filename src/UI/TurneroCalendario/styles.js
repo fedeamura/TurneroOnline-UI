@@ -154,7 +154,13 @@ const styles = theme => {
       }
     },
     colCalendarioDia: {
-      display: "flex"
+      display: "flex",
+      maxHeight: "100%",
+      opacity: 0,
+      transition: "all 0.3s",
+      "&.visible": {
+        opacity: 1
+      }
     },
     encabezadoTurnosDeDia: {
       display: "flex",
@@ -163,7 +169,10 @@ const styles = theme => {
       backgroundColor: "rgba(0, 0, 0, 0.025)",
       padding: theme.spacing.unit,
       paddingLeft: theme.spacing.unit * 2,
-      borderBottom: "1px solid rgba(0, 0, 0, 0.1)"
+      borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+      "& .textoTitulo": {
+        flex: 1
+      }
     },
     contenedorTurnos: {
       flex: 1,
@@ -179,6 +188,7 @@ const styles = theme => {
       backgroundColor: orange["500"]
     },
     contenedorInfoTurnero: {
+      minHeight: "fit-content",
       display: "flex",
       marginBottom: theme.spacing.unit * 4,
       alignItems: "center",
@@ -196,6 +206,21 @@ const styles = theme => {
     },
     imagenTurnero: {
       marginRight: theme.spacing.unit * 2
+    },
+    panelModoTurnos: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 16,
+      flex: 1,
+      "& .icono": {
+        fontSize: 72,
+        marginBottom: 16
+      },
+      "& .texto": {
+        textAlign: "center"
+      }
     }
   };
 };

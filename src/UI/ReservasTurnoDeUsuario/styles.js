@@ -118,6 +118,36 @@ const styles = theme => {
     cardInfoFiltroDia: {
       marginTop: theme.spacing.unit * 2,
       backgroundColor: yellow["50"]
+    },
+    botonesFiltro: {
+      display: "flex",
+      flexWrap: "wrap",
+      "& .boton": {
+        display: "flex",
+        alignItems: "center",
+        padding: 8,
+        borderRadius: 16,
+        backgroundColor: "rgba(0,0,0,0.05)",
+        transition: "all 0.3s",
+        margin: 8,
+        "& *": {
+          transition: "all 0.3s"
+        },
+        "&.resaltado": {
+          backgroundColor: theme.palette.primary.main,
+          "& *": {
+            color: "white"
+          }
+        },
+        "& .indicador": {
+          minWidth: 16,
+          minHeight: 16,
+          maxWidth: 16,
+          maxHeight: 16,
+          borderRadius: 16,
+          marginRight: 8
+        }
+      }
     }
   };
 };
